@@ -1,0 +1,20 @@
+# Rhythm Recovery
+
+Rhythm Recovery is a daily habit tracker for the first 90 days of recovery
+and beyond. It pairs a fixed daily checklist (reading, prayer/meditation,
+calls to a sponsor and fellowship, meeting attendance, journaling) with the
+12 steps, giving people a place to track and keep that daily rhythm. It
+does not promise or guarantee any recovery outcome.
+
+Key facts:
+- Not a social network: no feeds, no public profiles, no following.
+- Identity is anonymous by default (auto-generated display name).
+- Progress is shown as streaks and milestone badges (90 days, 6 months,
+  9 months, 1 year, 18 months, then annually), not a public leaderboard.
+- Users can optionally share a static snapshot (streak and milestone
+  progress only, never journal entries or contact details) via SMS or
+  email.
+- Recovery and journal data are treated as sensitive personal data.
+
+This site (rhythmrecovery.app) is a pre-launch landing page for early
+access sign-ups. The product itself has not shipped yet.
