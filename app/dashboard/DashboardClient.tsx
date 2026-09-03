@@ -14,6 +14,7 @@ import {
   useToast,
 } from "@/components/ui";
 import ChecklistItem from "@/components/dashboard/ChecklistItem";
+import ChecklistManageDialog from "@/components/dashboard/ChecklistManageDialog";
 import DailyProgressBar from "@/components/dashboard/DailyProgressBar";
 import DailyQuote from "@/components/dashboard/DailyQuote";
 import HelpfulLinks from "@/components/dashboard/HelpfulLinks";
@@ -22,24 +23,14 @@ import ProfileEditDialog from "@/components/dashboard/ProfileEditDialog";
 import { getEarnedMilestones, getNextMilestone, milestoneProgress } from "@/lib/milestones";
 import { createClient } from "@/lib/supabase/client";
 import {
-  CHECKLIST_FIELDS,
   calculateDayStreak,
   calculateWeekStreak,
   daysSince,
-  isEntryComplete,
-  type ChecklistField,
-  type DailyEntry,
+  isDateComplete,
+  requiredItemsForDate,
+  type ChecklistItem as ChecklistItemType,
+  type Completion,
 } from "@/lib/streaks";
-
-const CHECKLIST_LABELS: Record<ChecklistField, string> = {
-  read_literature: "Read literature",
-  morning_reflection: "Pray or meditate (morning)",
-  call_sponsor: "Call your sponsor",
-  call_fellowship: "Call someone in the fellowship",
-  attended_meeting: "Go to a meeting",
-  stayed_sober: "Didn't drink or use",
-  evening_reflection: "Pray or meditate (evening)",
-};
 
 type Profile = {
   username: string;
@@ -52,26 +43,10 @@ type Profile = {
   marketing_emails_opt_in: boolean;
 };
 
-type EntryRow = DailyEntry & { journal: string };
-
 function localToday(): string {
   const now = new Date();
   const local = new Date(now.getTime() - now.getTimezoneOffset() * 60_000);
   return local.toISOString().slice(0, 10);
-}
-
-function emptyEntry(date: string): EntryRow {
-  return {
-    entry_date: date,
-    read_literature: false,
-    morning_reflection: false,
-    call_sponsor: false,
-    call_fellowship: false,
-    attended_meeting: false,
-    stayed_sober: false,
-    evening_reflection: false,
-    journal: "",
-  };
 }
 
 function DashboardInner({ profile }: { profile: Profile }) {
@@ -82,12 +57,24 @@ function DashboardInner({ profile }: { profile: Profile }) {
   const reminded = useRef(false);
 
   const [userId, setUserId] = useState<string | null>(null);
-  const [entries, setEntries] = useState<EntryRow[]>([]);
+  const [items, setItems] = useState<ChecklistItemType[]>([]);
+  const [completions, setCompletions] = useState<Completion[]>([]);
   const [journal, setJournal] = useState("");
   const [loading, setLoading] = useState(true);
   const [journalStatus, setJournalStatus] = useState("");
   const [error, setError] = useState("");
   const [editingProfile, setEditingProfile] = useState(false);
+  const [editingChecklist, setEditingChecklist] = useState(false);
+
+  async function loadChecklistItems() {
+    const { data } = await supabase
+      .from("checklist_items")
+      .select("id, label, sort_order, archived, created_at")
+      .eq("archived", false)
+      .order("sort_order", { ascending: true });
+
+    if (data) setItems(data as ChecklistItemType[]);
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -101,22 +88,27 @@ function DashboardInner({ profile }: { profile: Profile }) {
       sinceDate.setDate(sinceDate.getDate() - 60);
       const since = sinceDate.toISOString().slice(0, 10);
 
-      const { data, error: fetchError } = await supabase
-        .from("daily_entries")
-        .select(
-          "entry_date, read_literature, morning_reflection, call_sponsor, call_fellowship, attended_meeting, stayed_sober, evening_reflection, journal",
-        )
-        .gte("entry_date", since)
-        .order("entry_date", { ascending: false });
+      const [itemsResult, completionsResult, journalResult] = await Promise.all([
+        supabase
+          .from("checklist_items")
+          .select("id, label, sort_order, archived, created_at")
+          .eq("archived", false)
+          .order("sort_order", { ascending: true }),
+        supabase
+          .from("daily_entry_completions")
+          .select("entry_date, checklist_item_id, completed")
+          .gte("entry_date", since),
+        supabase.from("daily_entries").select("journal").eq("entry_date", today).maybeSingle(),
+      ]);
 
       if (cancelled) return;
 
-      if (fetchError) {
+      if (itemsResult.error || completionsResult.error) {
         setError("Couldn't load today's checklist. Try refreshing.");
-      } else if (data) {
-        setEntries(data as EntryRow[]);
-        const todayEntry = data.find((entry) => entry.entry_date === today);
-        setJournal((todayEntry as EntryRow | undefined)?.journal ?? "");
+      } else {
+        if (itemsResult.data) setItems(itemsResult.data as ChecklistItemType[]);
+        if (completionsResult.data) setCompletions(completionsResult.data as Completion[]);
+        setJournal((journalResult.data as { journal: string } | null)?.journal ?? "");
       }
 
       setUserId(id);
@@ -129,9 +121,12 @@ function DashboardInner({ profile }: { profile: Profile }) {
     };
   }, [supabase, today]);
 
-  const todayEntry = entries.find((entry) => entry.entry_date === today) ?? emptyEntry(today);
-  const dayComplete = isEntryComplete(todayEntry);
-  const completedToday = CHECKLIST_FIELDS.filter((field) => todayEntry[field]).length;
+  const requiredToday = requiredItemsForDate(items, today);
+  const todayCompletedIds = new Set(
+    completions.filter((c) => c.entry_date === today && c.completed).map((c) => c.checklist_item_id),
+  );
+  const dayComplete = isDateComplete(items, todayCompletedIds, today);
+  const completedToday = requiredToday.filter((item) => todayCompletedIds.has(item.id)).length;
 
   // Tracks whether today's completion state just flipped to true (as
   // opposed to loading in already-complete) so the celebration animation
@@ -150,22 +145,26 @@ function DashboardInner({ profile }: { profile: Profile }) {
   useEffect(() => {
     if (loading || reminded.current || !profile.reminder_toast_enabled) return;
     if (new Date().getHours() < 21) return;
-    if (isEntryComplete(todayEntry)) return;
+    if (dayComplete) return;
 
     reminded.current = true;
     showToast("It's later in the day. A few tasks are still open on today's list.");
-  }, [loading, profile.reminder_toast_enabled, todayEntry, showToast]);
+  }, [loading, profile.reminder_toast_enabled, dayComplete, showToast]);
 
-  async function toggleField(field: ChecklistField) {
+  async function toggleItem(itemId: string) {
     if (!userId) return;
 
-    const updated: EntryRow = { ...todayEntry, [field]: !todayEntry[field] };
+    const completed = !todayCompletedIds.has(itemId);
 
-    setEntries((prev) => [updated, ...prev.filter((entry) => entry.entry_date !== today)]);
+    setCompletions((prev) => [
+      ...prev.filter((c) => !(c.entry_date === today && c.checklist_item_id === itemId)),
+      { entry_date: today, checklist_item_id: itemId, completed },
+    ]);
 
-    const { error: upsertError } = await supabase
-      .from("daily_entries")
-      .upsert({ ...updated, user_id: userId, journal }, { onConflict: "user_id,entry_date" });
+    const { error: upsertError } = await supabase.from("daily_entry_completions").upsert(
+      { user_id: userId, entry_date: today, checklist_item_id: itemId, completed },
+      { onConflict: "user_id,entry_date,checklist_item_id" },
+    );
 
     if (upsertError) {
       setError("Couldn't save that. Try again.");
@@ -179,7 +178,7 @@ function DashboardInner({ profile }: { profile: Profile }) {
 
     const { error: upsertError } = await supabase
       .from("daily_entries")
-      .upsert({ ...todayEntry, user_id: userId, journal }, { onConflict: "user_id,entry_date" });
+      .upsert({ user_id: userId, entry_date: today, journal }, { onConflict: "user_id,entry_date" });
 
     setJournalStatus(upsertError ? "Couldn't save." : "Saved");
   }
@@ -190,7 +189,7 @@ function DashboardInner({ profile }: { profile: Profile }) {
     router.refresh();
   }
 
-  const dayStreak = calculateDayStreak(entries, today);
+  const dayStreak = calculateDayStreak(items, completions, today);
   const weekStreak = calculateWeekStreak(dayStreak);
   const sober = daysSince(profile.sobriety_date, today);
   const milestone = getNextMilestone(sober);
@@ -213,6 +212,9 @@ function DashboardInner({ profile }: { profile: Profile }) {
         <Button variant="secondary" onClick={() => setEditingProfile(true)}>
           Edit profile
         </Button>
+        <Button variant="secondary" onClick={() => setEditingChecklist(true)}>
+          Manage checklist
+        </Button>
         <Button variant="secondary" onClick={handleLogOut}>
           Log out
         </Button>
@@ -221,7 +223,7 @@ function DashboardInner({ profile }: { profile: Profile }) {
       <DailyQuote date={today} />
 
       <ProfileEditDialog
-        key={editingProfile ? "open" : "closed"}
+        key={editingProfile ? "profile-open" : "profile-closed"}
         open={editingProfile}
         onClose={() => setEditingProfile(false)}
         username={profile.username}
@@ -232,6 +234,13 @@ function DashboardInner({ profile }: { profile: Profile }) {
         reminderToastEnabled={profile.reminder_toast_enabled}
         reminderEmailEnabled={profile.reminder_email_enabled}
         marketingEmailsOptIn={profile.marketing_emails_opt_in}
+      />
+
+      <ChecklistManageDialog
+        key={editingChecklist ? "checklist-open" : "checklist-closed"}
+        open={editingChecklist}
+        onClose={() => setEditingChecklist(false)}
+        onChanged={loadChecklistItems}
       />
 
       {error && (
@@ -302,18 +311,18 @@ function DashboardInner({ profile }: { profile: Profile }) {
           </svg>
         </div>
         <h2 style={{ marginTop: 0 }}>Today&apos;s checklist</h2>
-        <DailyProgressBar completed={completedToday} total={CHECKLIST_FIELDS.length} />
+        <DailyProgressBar completed={completedToday} total={requiredToday.length} />
         {dayComplete && (
           <p className="hint" role="status" style={{ marginTop: "-0.5rem", marginBottom: "1rem" }}>
             Today&apos;s list is complete.
           </p>
         )}
-        {CHECKLIST_FIELDS.map((field) => (
-          <div key={field} style={{ marginBottom: "0.6rem" }}>
+        {requiredToday.map((item) => (
+          <div key={item.id} style={{ marginBottom: "0.6rem" }}>
             <ChecklistItem
-              label={CHECKLIST_LABELS[field]}
-              checked={todayEntry[field]}
-              onChange={() => toggleField(field)}
+              label={item.label}
+              checked={todayCompletedIds.has(item.id)}
+              onChange={() => toggleItem(item.id)}
             />
           </div>
         ))}

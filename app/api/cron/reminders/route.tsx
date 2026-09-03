@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import ReminderEmail, { subject } from "@/emails/reminder";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { CHECKLIST_FIELDS } from "@/lib/streaks";
+import { requiredItemsForDate } from "@/lib/streaks";
 import { localDateString, localHour } from "@/lib/timezone";
 
 const FROM = process.env.EMAIL_FROM || "Rhythm Recovery <onboarding@resend.dev>";
@@ -48,17 +48,23 @@ export async function GET(request: Request) {
   for (const profile of due) {
     const today = localDateString(profile.timezone);
 
-    const { data: entry } = await supabase
-      .from("daily_entries")
-      .select(CHECKLIST_FIELDS.join(","))
+    const { data: items } = await supabase
+      .from("checklist_items")
+      .select("id, label, sort_order, archived, created_at")
+      .eq("user_id", profile.id);
+
+    const required = requiredItemsForDate(items ?? [], today);
+    if (required.length === 0) continue;
+
+    const { data: completions } = await supabase
+      .from("daily_entry_completions")
+      .select("checklist_item_id")
       .eq("user_id", profile.id)
       .eq("entry_date", today)
-      .maybeSingle<Record<string, boolean>>();
+      .eq("completed", true);
 
-    const completed = entry
-      ? CHECKLIST_FIELDS.filter((field) => entry[field]).length
-      : 0;
-    const tasksRemaining = CHECKLIST_FIELDS.length - completed;
+    const completedIds = new Set((completions ?? []).map((c) => c.checklist_item_id));
+    const tasksRemaining = required.filter((item) => !completedIds.has(item.id)).length;
 
     if (tasksRemaining === 0) continue;
 
