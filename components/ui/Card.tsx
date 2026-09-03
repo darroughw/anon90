@@ -1,11 +1,12 @@
-import type { ReactNode } from "react";
+import type { HTMLAttributes } from "react";
 
-type CardProps = {
-  children: ReactNode;
-  className?: string;
-};
+type CardProps = HTMLAttributes<HTMLDivElement>;
 
-export default function Card({ children, className }: CardProps) {
+export default function Card({ children, className, ...props }: CardProps) {
   const classes = ["ds-card", className].filter(Boolean).join(" ");
-  return <div className={classes}>{children}</div>;
+  return (
+    <div className={classes} {...props}>
+      {children}
+    </div>
+  );
 }

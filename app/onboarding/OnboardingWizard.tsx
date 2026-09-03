@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { Alert, Button, FormField, Input, Switch } from "@/components/ui";
+import { Alert, Button, Checkbox, FormField, Input, Switch } from "@/components/ui";
 import { completeOnboarding } from "./actions";
 
 type Step = 1 | 2 | 3;
@@ -13,6 +13,8 @@ export default function OnboardingWizard({ suggestedUsername }: { suggestedUsern
   const [username, setUsername] = useState(suggestedUsername);
   const [sobrietyDate, setSobrietyDate] = useState("");
   const [hasSponsor, setHasSponsor] = useState(false);
+  const [hasServicePosition, setHasServicePosition] = useState(false);
+  const [hasHomegroup, setHasHomegroup] = useState(false);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -47,6 +49,8 @@ export default function OnboardingWizard({ suggestedUsername }: { suggestedUsern
       username: username.trim(),
       sobrietyDate,
       hasSponsor,
+      hasServicePosition,
+      hasHomegroup,
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     });
     if (result?.error) {
@@ -121,6 +125,22 @@ export default function OnboardingWizard({ suggestedUsername }: { suggestedUsern
               That&apos;s okay for now. We&apos;ll remind you to find one until you add it later.
             </p>
           )}
+
+          <div style={{ marginTop: "1.25rem" }}>
+            <Checkbox
+              label="I have a service position"
+              checked={hasServicePosition}
+              onChange={(event) => setHasServicePosition(event.target.checked)}
+            />
+          </div>
+          <div style={{ marginTop: "0.75rem" }}>
+            <Checkbox
+              label="I have a homegroup"
+              checked={hasHomegroup}
+              onChange={(event) => setHasHomegroup(event.target.checked)}
+            />
+          </div>
+
           <div className="ds-row" style={{ marginTop: "1.5rem" }}>
             <Button type="button" variant="ghost" onClick={() => setStep(2)}>
               Back

@@ -6,6 +6,7 @@
   --border-interactive: rgba(242, 233, 221, 0.4);
   --glow-rgb: 242, 233, 221;
   --glow: 0 0 24px rgba(var(--glow-rgb), 0.25);
+  --warm-glow-rgb: 160, 82, 45;
   --radius: 6px;
   --error: #e2827e;
   --chip-bg: rgba(242, 233, 221, 0.06);
@@ -504,6 +505,74 @@ button[type="submit"]:disabled {
   transform: rotate(45deg) translate(-1px, -1px);
 }
 
+/* Checklist item cross-off (ANO-15): plays only on the click that checks
+   the item -- .ds-checklist-item--pop is added transiently by the
+   component, not derived from :checked, so an already-complete day loaded
+   from the server doesn't replay the animation. */
+.ds-checklist-item__label {
+  position: relative;
+  display: inline-block;
+  transition: opacity 0.3s ease;
+}
+
+.ds-checklist-item input[type="checkbox"]:checked ~ .ds-checklist-item__label {
+  opacity: 0.6;
+}
+
+.ds-checklist-item__label::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 2px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+.ds-checklist-item input[type="checkbox"]:checked ~ .ds-checklist-item__label::after {
+  transform: scaleX(1);
+}
+
+.ds-checklist-item--pop input[type="checkbox"] {
+  animation: ds-checklist-pop 0.45s ease;
+}
+
+.ds-checklist-item--pop .ds-checklist-item__label::after {
+  animation: ds-checklist-strike 0.5s ease-out;
+}
+
+@keyframes ds-checklist-pop {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 rgba(var(--glow-rgb), 0);
+  }
+  45% {
+    transform: scale(1.25);
+    box-shadow: 0 0 12px rgba(var(--glow-rgb), 0.6);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 rgba(var(--glow-rgb), 0);
+  }
+}
+
+@keyframes ds-checklist-strike {
+  from {
+    transform: scaleX(0);
+    box-shadow: 0 0 0 rgba(var(--glow-rgb), 0);
+  }
+  60% {
+    transform: scaleX(1);
+    box-shadow: 0 0 8px rgba(var(--glow-rgb), 0.7);
+  }
+  100% {
+    transform: scaleX(1);
+    box-shadow: 0 0 0 rgba(var(--glow-rgb), 0);
+  }
+}
+
 .ds-switch-row {
   display: flex;
   align-items: center;
@@ -596,11 +665,87 @@ button[type="submit"]:disabled {
 }
 
 .ds-card {
+  position: relative;
   padding: 1.25rem;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--chip-bg);
   box-shadow: var(--shadow-sm);
+}
+
+/* Checklist completion (ANO-15): a warm pulse the moment the day's list is
+   finished, settling into a quiet, persistent checkmark badge -- reward
+   through restraint, not a confetti burst. Respects prefers-reduced-motion
+   via the global animation/transition-duration override above. */
+.ds-day-complete-badge {
+  position: absolute;
+  top: 0.85rem;
+  right: 0.85rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: grid;
+  place-content: center;
+  background: rgba(var(--warm-glow-rgb), 0.16);
+  border: 1px solid rgba(var(--warm-glow-rgb), 0.5);
+  color: var(--fg);
+  opacity: 0;
+  transform: scale(0.6);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+}
+
+.ds-day-complete-badge svg {
+  width: 20px;
+  height: 20px;
+}
+
+.ds-checklist-card--complete .ds-day-complete-badge {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.ds-checklist-card--just-completed .ds-day-complete-badge {
+  animation: ds-day-complete-badge-pop 0.7s ease-out;
+}
+
+@keyframes ds-day-complete-badge-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) rotate(-10deg);
+  }
+  55% {
+    opacity: 1;
+    transform: scale(1.25) rotate(5deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+.ds-checklist-card--just-completed {
+  animation: ds-day-complete-pulse 1.8s ease-out;
+}
+
+@keyframes ds-day-complete-pulse {
+  0%,
+  100% {
+    box-shadow: var(--shadow-sm);
+    border-color: var(--border);
+  }
+  25% {
+    box-shadow: var(--shadow-sm), 0 0 36px rgba(var(--warm-glow-rgb), 0.55);
+    border-color: rgba(var(--warm-glow-rgb), 0.6);
+  }
+  55% {
+    box-shadow: var(--shadow-sm), 0 0 12px rgba(var(--warm-glow-rgb), 0.25);
+    border-color: var(--border);
+  }
+  75% {
+    box-shadow: var(--shadow-sm), 0 0 28px rgba(var(--warm-glow-rgb), 0.4);
+    border-color: rgba(var(--warm-glow-rgb), 0.45);
+  }
 }
 
 .ds-stat {

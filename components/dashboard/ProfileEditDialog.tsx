@@ -2,7 +2,18 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { Alert, Badge, Button, Dialog, Divider, FormField, Input, ProgressBar, Switch } from "@/components/ui";
+import {
+  Alert,
+  Badge,
+  Button,
+  Checkbox,
+  Dialog,
+  Divider,
+  FormField,
+  Input,
+  ProgressBar,
+  Switch,
+} from "@/components/ui";
 import { deleteAccount, updateProfile } from "@/app/dashboard/actions";
 import { getNextMilestone, milestoneProgress } from "@/lib/milestones";
 import { getDailyQuote } from "@/lib/quotes";
@@ -14,6 +25,8 @@ type ProfileEditDialogProps = {
   onClose: () => void;
   username: string;
   hasSponsor: boolean;
+  hasServicePosition: boolean;
+  hasHomegroup: boolean;
   sobrietyDate: string;
   reminderToastEnabled: boolean;
   reminderEmailEnabled: boolean;
@@ -30,6 +43,8 @@ export default function ProfileEditDialog({
   onClose,
   username,
   hasSponsor,
+  hasServicePosition,
+  hasHomegroup,
   sobrietyDate,
   reminderToastEnabled,
   reminderEmailEnabled,
@@ -38,6 +53,8 @@ export default function ProfileEditDialog({
   const router = useRouter();
   const [usernameValue, setUsernameValue] = useState(username);
   const [sponsorValue, setSponsorValue] = useState(hasSponsor);
+  const [servicePositionValue, setServicePositionValue] = useState(hasServicePosition);
+  const [homegroupValue, setHomegroupValue] = useState(hasHomegroup);
   const [sobrietyDateValue, setSobrietyDateValue] = useState(sobrietyDate);
   const [reminderToastValue, setReminderToastValue] = useState(reminderToastEnabled);
   const [reminderEmailValue, setReminderEmailValue] = useState(reminderEmailEnabled);
@@ -61,6 +78,8 @@ export default function ProfileEditDialog({
     const result = await updateProfile({
       username: usernameValue,
       hasSponsor: sponsorValue,
+      hasServicePosition: servicePositionValue,
+      hasHomegroup: homegroupValue,
       sobrietyDate: sobrietyDateValue,
       reminderToastEnabled: reminderToastValue,
       reminderEmailEnabled: reminderEmailValue,
@@ -144,8 +163,22 @@ export default function ProfileEditDialog({
           <ProgressBar value={progress} label={`Progress toward ${milestone.label}`} />
         </div>
 
-        <div style={{ marginBottom: "1.25rem" }}>
+        <div style={{ marginBottom: "0.75rem" }}>
           <Switch label="I have a sponsor" checked={sponsorValue} onCheckedChange={setSponsorValue} />
+        </div>
+        <div style={{ marginBottom: "0.75rem" }}>
+          <Checkbox
+            label="I have a service position"
+            checked={servicePositionValue}
+            onChange={(event) => setServicePositionValue(event.target.checked)}
+          />
+        </div>
+        <div style={{ marginBottom: "1.25rem" }}>
+          <Checkbox
+            label="I have a homegroup"
+            checked={homegroupValue}
+            onChange={(event) => setHomegroupValue(event.target.checked)}
+          />
         </div>
 
         <Divider />

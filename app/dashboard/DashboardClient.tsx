@@ -7,13 +7,13 @@ import {
   Badge,
   Button,
   Card,
-  Checkbox,
   ProgressBar,
   StatDisplay,
   Textarea,
   ToastProvider,
   useToast,
 } from "@/components/ui";
+import ChecklistItem from "@/components/dashboard/ChecklistItem";
 import DailyQuote from "@/components/dashboard/DailyQuote";
 import HelpfulLinks from "@/components/dashboard/HelpfulLinks";
 import MilestoneBadges from "@/components/dashboard/MilestoneBadges";
@@ -44,6 +44,8 @@ type Profile = {
   username: string;
   sobriety_date: string;
   has_sponsor: boolean;
+  has_service_position: boolean;
+  has_homegroup: boolean;
   reminder_toast_enabled: boolean;
   reminder_email_enabled: boolean;
   marketing_emails_opt_in: boolean;
@@ -127,6 +129,21 @@ function DashboardInner({ profile }: { profile: Profile }) {
   }, [supabase, today]);
 
   const todayEntry = entries.find((entry) => entry.entry_date === today) ?? emptyEntry(today);
+  const dayComplete = isEntryComplete(todayEntry);
+
+  // Tracks whether today's completion state just flipped to true (as
+  // opposed to loading in already-complete) so the celebration animation
+  // only plays on the actual completing action, once, this session -- not
+  // on every render of an already-finished day.
+  const [trackedComplete, setTrackedComplete] = useState<boolean | null>(null);
+  const [justCompletedDay, setJustCompletedDay] = useState(false);
+
+  if (!loading && dayComplete !== trackedComplete) {
+    setTrackedComplete(dayComplete);
+    if (dayComplete && trackedComplete !== null) {
+      setJustCompletedDay(true);
+    }
+  }
 
   useEffect(() => {
     if (loading || reminded.current || !profile.reminder_toast_enabled) return;
@@ -207,6 +224,8 @@ function DashboardInner({ profile }: { profile: Profile }) {
         onClose={() => setEditingProfile(false)}
         username={profile.username}
         hasSponsor={profile.has_sponsor}
+        hasServicePosition={profile.has_service_position}
+        hasHomegroup={profile.has_homegroup}
         sobrietyDate={profile.sobriety_date}
         reminderToastEnabled={profile.reminder_toast_enabled}
         reminderEmailEnabled={profile.reminder_email_enabled}
@@ -227,6 +246,22 @@ function DashboardInner({ profile }: { profile: Profile }) {
         </div>
       )}
 
+      {!profile.has_service_position && (
+        <div style={{ marginBottom: "1.5rem" }}>
+          <Alert variant="info">
+            Consider taking on a service position. You can add one anytime from your profile.
+          </Alert>
+        </div>
+      )}
+
+      {!profile.has_homegroup && (
+        <div style={{ marginBottom: "1.5rem" }}>
+          <Alert variant="info">
+            Consider finding a homegroup. You can add one anytime from your profile.
+          </Alert>
+        </div>
+      )}
+
       <div className="ds-row" style={{ justifyContent: "center", marginBottom: "1.5rem" }}>
         <StatDisplay value={dayStreak} label="Day streak" />
         <StatDisplay value={weekStreak} label="Week streak" />
@@ -243,11 +278,36 @@ function DashboardInner({ profile }: { profile: Profile }) {
 
       <MilestoneBadges earned={earnedMilestones} />
 
-      <Card>
+      <Card
+        className={[
+          "ds-checklist-card",
+          dayComplete && "ds-checklist-card--complete",
+          justCompletedDay && "ds-checklist-card--just-completed",
+        ]
+          .filter(Boolean)
+          .join(" ")}
+        onAnimationEnd={() => setJustCompletedDay(false)}
+      >
+        <div className="ds-day-complete-badge" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path
+              d="M5 13l4 4L19 7"
+              stroke="currentColor"
+              strokeWidth="3"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </div>
         <h2 style={{ marginTop: 0 }}>Today&apos;s checklist</h2>
+        {dayComplete && (
+          <p className="hint" role="status" style={{ marginTop: "-0.5rem", marginBottom: "1rem" }}>
+            Today&apos;s list is complete.
+          </p>
+        )}
         {CHECKLIST_FIELDS.map((field) => (
           <div key={field} style={{ marginBottom: "0.6rem" }}>
-            <Checkbox
+            <ChecklistItem
               label={CHECKLIST_LABELS[field]}
               checked={todayEntry[field]}
               onChange={() => toggleField(field)}

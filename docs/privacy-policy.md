@@ -17,6 +17,7 @@ Rhythm Recovery ("we," "us") helps you track daily activities over a 90-day peri
 - Auto-generated anonymous username (editable by you at any time)
 - Your daily activity list and completion history
 - Streak history and earned badges
+- Sponsor, service position, and homegroup status
 
 **Communication preferences**
 - Reminder settings (in-app and email reminders, each on or off independently)
@@ -58,7 +59,7 @@ We use third-party infrastructure providers to operate the product. These provid
 
 ## Your Choices
 
-- Change your anonymous display name, sponsor status, and sobriety date at any time from your profile
+- Change your anonymous display name, sponsor/service position/homegroup status, and sobriety date at any time from your profile
 - Turn in-app and email reminders on or off independently
 - Opt in/out of product-update emails independently of reminders
 - Delete your account at any time from your profile

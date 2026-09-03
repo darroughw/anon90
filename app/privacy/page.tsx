@@ -42,6 +42,7 @@ export default function PrivacyPage() {
         <li>Auto-generated anonymous username (editable by you at any time)</li>
         <li>Your daily activity list and completion history</li>
         <li>Streak history and earned badges</li>
+        <li>Sponsor, service position, and homegroup status</li>
       </ul>
 
       <p>
@@ -129,8 +130,9 @@ export default function PrivacyPage() {
       <h2>Your Choices</h2>
       <ul>
         <li>
-          Change your anonymous display name, sponsor status, and sobriety
-          date at any time from your profile
+          Change your anonymous display name, sponsor/service
+          position/homegroup status, and sobriety date at any time from your
+          profile
         </li>
         <li>Turn in-app and email reminders on or off independently</li>
         <li>Opt in/out of product-update emails independently of reminders</li>

@@ -7,6 +7,8 @@ import { createClient } from "@/lib/supabase/server";
 type UpdateProfileInput = {
   username: string;
   hasSponsor: boolean;
+  hasServicePosition: boolean;
+  hasHomegroup: boolean;
   sobrietyDate: string;
   reminderToastEnabled: boolean;
   reminderEmailEnabled: boolean;
@@ -40,6 +42,8 @@ export async function updateProfile(input: UpdateProfileInput): Promise<UpdatePr
     .update({
       username,
       has_sponsor: input.hasSponsor,
+      has_service_position: input.hasServicePosition,
+      has_homegroup: input.hasHomegroup,
       sobriety_date: input.sobrietyDate,
       reminder_toast_enabled: input.reminderToastEnabled,
       reminder_email_enabled: input.reminderEmailEnabled,
