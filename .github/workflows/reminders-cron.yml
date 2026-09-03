@@ -1,0 +1,21 @@
+name: Reminders cron
+
+on:
+  schedule:
+    - cron: "0 * * * *"
+  workflow_dispatch: {}
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call reminders endpoint
+        run: |
+          status=$(curl -sS -o /dev/null -w "%{http_code}" \
+            -X GET "https://rhythmrecovery.app/api/cron/reminders" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}")
+          echo "Response status: $status"
+          if [ "$status" -ge 300 ]; then
+            echo "Reminders endpoint returned $status"
+            exit 1
+          fi

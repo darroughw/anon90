@@ -9,6 +9,7 @@ This repo holds the pre-launch landing page plus the early scaffolding of the fu
 - [Next.js](https://nextjs.org) (App Router)
 - TypeScript
 - [Supabase](https://supabase.com) (`@supabase/ssr`) — auth and the app's data store
+- [Vercel Analytics](https://vercel.com/docs/analytics) (`@vercel/analytics`) — page view tracking; only reports when deployed on Vercel, a no-op locally
 - No UI framework or CSS library, plain CSS in [app/globals.css](app/globals.css); a small shared primitives library in `components/ui/`
 
 ## Getting started
@@ -92,7 +93,13 @@ Per docs/mvp-scope.md, transactional and marketing/subscriber emails are kept se
 
 ## Reminders & cron
 
-`app/api/cron/reminders/route.tsx` runs hourly via Vercel Cron (`vercel.json`) and requires a `CRON_SECRET` env var — Vercel automatically sends it as `Authorization: Bearer $CRON_SECRET` when invoking scheduled functions; the route rejects anything else. Cron jobs don't run under `next dev`; to test locally, call the route directly with that header.
+`app/api/cron/reminders/route.tsx` needs to run hourly, but Vercel Cron only supports daily schedules on the Hobby plan — so it's triggered instead by a GitHub Actions scheduled workflow (`.github/workflows/reminders-cron.yml`), which needs a repo secret: **GitHub → Settings → Secrets and variables → Actions → New repository secret** → name `CRON_SECRET`, same value as the Vercel env var of the same name (the route checks `Authorization: Bearer <CRON_SECRET>`, so both need to match). If this project ever moves to Vercel Pro, switching back to a native Vercel Cron entry in `vercel.json` (`{"crons":[{"path":"/api/cron/reminders","schedule":"0 * * * *"}]}`) is simpler and one less thing depending on GitHub Actions staying enabled.
+
+To test locally, call the route directly with the header:
+
+```bash
+curl -H "Authorization: Bearer $CRON_SECRET" http://localhost:3000/api/cron/reminders
+```
 
 A user's local day boundary (used both for the dashboard's `localToday()` and for this cron job) relies on `profiles.timezone`, captured once at onboarding via `Intl.DateTimeFormat().resolvedOptions().timeZone`. There's no UI to change it after signup yet.
 
