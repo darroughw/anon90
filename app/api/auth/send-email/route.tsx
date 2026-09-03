@@ -38,10 +38,16 @@ export async function POST(request: Request) {
   const rawBody = await request.text();
   const headers = Object.fromEntries(request.headers);
 
+  // Supabase displays this secret as "v1,whsec_<base64>"; standardwebhooks
+  // only strips a leading "whsec_" itself, so the "v1," has to go first or
+  // every signature check fails silently against a garbage decoded key.
+  const signingSecret = secret.replace(/^v1,/, "");
+
   let payload: HookPayload;
   try {
-    payload = new Webhook(secret).verify(rawBody, headers) as HookPayload;
-  } catch {
+    payload = new Webhook(signingSecret).verify(rawBody, headers) as HookPayload;
+  } catch (err) {
+    console.error("[auth-email] signature verification failed:", err);
     return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
   }
 
