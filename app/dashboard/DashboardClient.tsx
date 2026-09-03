@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   Alert,
@@ -18,8 +19,10 @@ import ChecklistManageDialog from "@/components/dashboard/ChecklistManageDialog"
 import DailyProgressBar from "@/components/dashboard/DailyProgressBar";
 import DailyQuote from "@/components/dashboard/DailyQuote";
 import HelpfulLinks from "@/components/dashboard/HelpfulLinks";
+import JournalEcho from "@/components/dashboard/JournalEcho";
 import MilestoneBadges from "@/components/dashboard/MilestoneBadges";
 import ProfileEditDialog from "@/components/dashboard/ProfileEditDialog";
+import { anniversaryCandidateDates, matchAnniversaries, type JournalAnniversary } from "@/lib/journal";
 import { getEarnedMilestones, getNextMilestone, milestoneProgress } from "@/lib/milestones";
 import { createClient } from "@/lib/supabase/client";
 import {
@@ -59,6 +62,7 @@ function DashboardInner({ profile }: { profile: Profile }) {
   const [userId, setUserId] = useState<string | null>(null);
   const [items, setItems] = useState<ChecklistItemType[]>([]);
   const [completions, setCompletions] = useState<Completion[]>([]);
+  const [anniversaries, setAnniversaries] = useState<JournalAnniversary[]>([]);
   const [journal, setJournal] = useState("");
   const [loading, setLoading] = useState(true);
   const [journalStatus, setJournalStatus] = useState("");
@@ -88,7 +92,7 @@ function DashboardInner({ profile }: { profile: Profile }) {
       sinceDate.setDate(sinceDate.getDate() - 60);
       const since = sinceDate.toISOString().slice(0, 10);
 
-      const [itemsResult, completionsResult, journalResult] = await Promise.all([
+      const [itemsResult, completionsResult, journalResult, anniversariesResult] = await Promise.all([
         supabase
           .from("checklist_items")
           .select("id, label, sort_order, archived, created_at")
@@ -99,6 +103,10 @@ function DashboardInner({ profile }: { profile: Profile }) {
           .select("entry_date, checklist_item_id, completed")
           .gte("entry_date", since),
         supabase.from("daily_entries").select("journal").eq("entry_date", today).maybeSingle(),
+        supabase
+          .from("daily_entries")
+          .select("entry_date, journal")
+          .in("entry_date", anniversaryCandidateDates(today)),
       ]);
 
       if (cancelled) return;
@@ -109,6 +117,9 @@ function DashboardInner({ profile }: { profile: Profile }) {
         if (itemsResult.data) setItems(itemsResult.data as ChecklistItemType[]);
         if (completionsResult.data) setCompletions(completionsResult.data as Completion[]);
         setJournal((journalResult.data as { journal: string } | null)?.journal ?? "");
+        if (anniversariesResult.data) {
+          setAnniversaries(matchAnniversaries(anniversariesResult.data, today));
+        }
       }
 
       setUserId(id);
@@ -289,6 +300,8 @@ function DashboardInner({ profile }: { profile: Profile }) {
 
       <MilestoneBadges earned={earnedMilestones} />
 
+      <JournalEcho anniversaries={anniversaries} />
+
       <Card
         className={[
           "ds-checklist-card",
@@ -338,6 +351,9 @@ function DashboardInner({ profile }: { profile: Profile }) {
             onBlur={saveJournal}
           />
           <p className="ds-field__hint">{journalStatus}</p>
+          <Link href="/dashboard/journal" className="hint">
+            View your past notes &rarr;
+          </Link>
         </div>
       </Card>
 

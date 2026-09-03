@@ -49,7 +49,7 @@ function toUTCDays(dateStr: string): number {
   return Date.UTC(y, m - 1, d) / 86_400_000;
 }
 
-function shiftDate(dateStr: string, days: number): string {
+export function shiftDate(dateStr: string, days: number): string {
   const [y, m, d] = dateStr.split("-").map(Number);
   const date = new Date(Date.UTC(y, m - 1, d));
   date.setUTCDate(date.getUTCDate() + days);
