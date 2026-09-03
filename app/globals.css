@@ -844,6 +844,36 @@ button[type="submit"]:disabled {
   color: var(--fg-muted);
 }
 
+.ds-rhythm__range {
+  display: inline-flex;
+  gap: 0.3rem;
+  flex-shrink: 0;
+}
+
+.ds-rhythm__range-btn {
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.3rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--chip-bg);
+  color: var(--fg-muted);
+  cursor: pointer;
+  transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+}
+
+.ds-rhythm__range-btn:hover {
+  border-color: var(--border-interactive);
+  color: var(--fg);
+}
+
+.ds-rhythm__range-btn[aria-pressed="true"] {
+  background: var(--fg);
+  color: var(--bg);
+  border-color: var(--fg);
+}
+
 .ds-avatar {
   display: inline-flex;
   align-items: center;

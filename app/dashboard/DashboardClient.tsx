@@ -31,7 +31,6 @@ import {
   calculateWeekStreak,
   daysSince,
   isDateComplete,
-  recentCompletionHistory,
   requiredItemsForDate,
   type ChecklistItem as ChecklistItemType,
   type Completion,
@@ -204,7 +203,6 @@ function DashboardInner({ profile }: { profile: Profile }) {
 
   const dayStreak = calculateDayStreak(items, completions, today);
   const weekStreak = calculateWeekStreak(dayStreak);
-  const rhythmHistory = recentCompletionHistory(items, completions, today, 21);
   const sober = daysSince(profile.sobriety_date, today);
   const milestone = getNextMilestone(sober);
   const progress = milestoneProgress(sober, milestone);
@@ -291,7 +289,13 @@ function DashboardInner({ profile }: { profile: Profile }) {
         <StatDisplay value={sober} label="Days sober" />
       </div>
 
-      <RhythmStreak dayStreak={dayStreak} weekStreak={weekStreak} history={rhythmHistory} />
+      <RhythmStreak
+        dayStreak={dayStreak}
+        weekStreak={weekStreak}
+        items={items}
+        completions={completions}
+        today={today}
+      />
 
       <div style={{ marginBottom: "2rem" }}>
         <div className="ds-row" style={{ justifyContent: "space-between", marginBottom: "0.5rem" }}>
