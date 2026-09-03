@@ -2,7 +2,7 @@
 
 A daily habit tracker that pairs fixed recovery commitments with the 12 steps, built to help people keep that rhythm one day at a time. See [docs/mvp-scope.md](docs/mvp-scope.md) for the full product scope, name, mission, and voice guide.
 
-This repo holds the pre-launch landing page and the full app: auth, onboarding, the daily-checklist/streak/milestone core loop, reminders, and email. Tracked in Linear under the Anon90 team, Rhythm Recovery project.
+The homepage links straight into real sign-up/sign-in — this is the live product, not a pre-launch waitlist. Tracked in Linear under the Anon90 team, Rhythm Recovery project.
 
 ## Stack
 
@@ -22,11 +22,11 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
-The landing page and sign-up form work with no configuration (email address, logged server-side). The "Continue with Google" button and Google Sheets persistence only activate once the Google env vars below are set. `/login`, `/signup`, `/dashboard`, and `/onboarding` need `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` set to a real Supabase project to work — without them those routes render but auth actions will fail.
+The homepage itself renders with no configuration, but its "Create your account" button leads to `/signup`, which needs `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` set to a real Supabase project to actually work — without them `/login`, `/signup`, `/dashboard`, and `/onboarding` render but auth actions fail.
 
 ## Structure
 
-- `app/page.tsx` — landing page (logo, mission statement, early-access sign-up)
+- `app/page.tsx` — homepage (logo, mission statement, links to create an account or sign in)
 - `app/privacy/page.tsx` — privacy policy page (kept in sync with [docs/privacy-policy.md](docs/privacy-policy.md))
 - `app/terms/page.tsx` — terms of service page (kept in sync with [docs/terms-of-service.md](docs/terms-of-service.md))
 - `app/login/`, `app/signup/` — Supabase email/password + Google OAuth sign-in
@@ -35,10 +35,10 @@ The landing page and sign-up form work with no configuration (email address, log
 - `app/auth/callback/route.ts` — OAuth callback, exchanges the code for a session
 - `app/design-system/` — internal preview of the `components/ui/` primitives
 - `app/not-found.tsx` — custom 404
-- `app/api/subscribe/route.ts` — sign-up endpoint: verifies a Google ID token or a plain email, then records the row
+- `app/api/subscribe/route.ts` — legacy pre-launch waitlist endpoint (verifies a Google ID token or a plain email, then records the row); not linked from the site anymore, kept working in case it's needed again
 - `app/robots.ts`, `app/sitemap.ts` — SEO metadata routes
 - `public/llms.txt` — plain-language summary for AI crawlers/answer engines
-- `components/SignupForm.tsx` — landing-page sign-up form, including the Google Identity Services button
+- `components/SignupForm.tsx` — legacy pre-launch waitlist form (including the Google Identity Services button); not rendered anywhere currently
 - `components/auth/` — `LoginForm`, `SignUpForm`
 - `components/ui/` — shared primitives (Button, Input, Dialog, Toast, Switch, etc.)
 - `components/ThemeToggle.tsx` — dark/light switch (footer, every page); dark is the default, choice persists in `localStorage`, applied via a blocking inline script in `app/layout.tsx` before first paint to avoid a flash of the wrong theme. Light-mode tokens live in `app/globals.css` under `:root[data-theme="light"]`.
@@ -57,9 +57,9 @@ The landing page and sign-up form work with no configuration (email address, log
 - `emails/` — transactional email templates (see Email templates below)
 - `docs/` — product scope, mission/voice guide, privacy policy and terms of service drafts, accessibility process, logo source
 
-## Google integration
+## Google integration (legacy pre-launch waitlist)
 
-Sign-ups (from either the email field or the Google button) are appended as rows to a Google Sheet. Set these in `.env.local` (see [.env.local.example](.env.local.example) for the full walkthrough):
+`components/SignupForm.tsx` and `app/api/subscribe/` still work but aren't linked from the site anymore — the homepage now sends people straight to real sign-up. Kept in case a waitlist capture point is needed again; if not, safe to remove along with `lib/googleSheets.ts` and `lib/verifyGoogleToken.ts`. When it was live, sign-ups (from either the email field or the Google button) were appended as rows to a Google Sheet. Set these in `.env.local` (see [.env.local.example](.env.local.example) for the full walkthrough):
 
 - `NEXT_PUBLIC_GOOGLE_CLIENT_ID` — OAuth Client ID from [Google Cloud Console credentials](https://console.cloud.google.com/apis/credentials), used by the "Continue with Google" button and to verify tokens server-side. Public value, safe to expose to the browser.
 - `GOOGLE_SHEETS_SPREADSHEET_ID`, `GOOGLE_SERVICE_ACCOUNT_EMAIL`, `GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY` — a service account with Editor access to a Sheet with a "Signups" tab.
@@ -70,7 +70,7 @@ Without these, the Google button doesn't render and the API route falls back to 
 
 Built with [react-email](https://react.email) and sent via [Resend](https://resend.com), matching the voice guide (plain, no outcome promises, no hype):
 
-- `emails/confirmation.tsx` — sent right after someone registers on the landing page (transactional/subscriber — see Email system below)
+- `emails/confirmation.tsx` — sent right after someone registers via the legacy waitlist endpoint (transactional/subscriber — see Email system below); dormant while that endpoint is unlinked
 - `emails/launch.tsx` — for the list when the app is ready; not wired to an actual send yet (no bulk-send/campaign tooling built)
 - `emails/authAction.tsx` — signup confirmation, password reset, magic link, email change — sent via a Supabase Auth "Send Email" hook (`app/api/auth/send-email/route.tsx`) instead of Supabase's default sender/template
 - `emails/reminder.tsx` — the email half of Reminders, sent by `app/api/cron/reminders/route.tsx`
@@ -91,7 +91,7 @@ The email logo (`public/email/logo.png`) is a separate asset from the site logo:
 Per docs/mvp-scope.md, transactional and marketing/subscriber emails are kept separate:
 
 - **Transactional** (`authAction.tsx`, `reminder.tsx`) — tied to core product function, no unsubscribe link; users control reminders via the per-channel toggles in the profile-edit dialog instead.
-- **Marketing/subscriber** (`confirmation.tsx`, `launch.tsx`) — explicit opt-in (`profiles.marketing_emails_opt_in`, off by default) and one-click unsubscribe (`app/unsubscribe/`, token-verified, no login required). This only covers registered users — the pre-launch waitlist (Google Sheets-backed, see Google integration) has no working unsubscribe yet, since there's no per-row status to update there; that's expected to go away once Sheets is replaced as the capture mechanism.
+- **Marketing/subscriber** (`confirmation.tsx`, `launch.tsx`) — explicit opt-in (`profiles.marketing_emails_opt_in`, off by default) and one-click unsubscribe (`app/unsubscribe/`, token-verified, no login required). This only covers registered users — the legacy pre-launch waitlist (Google Sheets-backed, see Google integration) has no working unsubscribe, since there's no per-row status to update there. Moot while that capture point is unlinked from the site.
 
 ## Reminders & cron
 
@@ -107,9 +107,8 @@ A user's local day boundary (used both for the dashboard's `localToday()` and fo
 
 ## Known gaps
 
-- `[date]`, `[30]`, and `[Support email / contact method]` in the privacy policy are placeholders pending legal review.
 - `supabase/migrations/` isn't applied automatically — there's no `supabase` CLI project link, so new migrations need to be pasted into the Supabase SQL Editor by hand.
-- The pre-launch waitlist (Google Sheets) has no working unsubscribe (see Email system above).
+- The legacy pre-launch waitlist (Google Sheets) has no working unsubscribe, and isn't linked from the site (see Email system above) — candidate for removal.
 - `profiles.timezone` has no settings-page UI to change after onboarding.
 
 ## CI & accessibility

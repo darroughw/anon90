@@ -12,13 +12,13 @@ const description =
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Rhythm Recovery — Coming Soon",
+    default: "Rhythm Recovery",
     template: "%s — Rhythm Recovery",
   },
   description,
   openGraph: {
     type: "website",
-    title: "Rhythm Recovery — Coming Soon",
+    title: "Rhythm Recovery",
     description,
     url: siteUrl,
     siteName: "Rhythm Recovery",
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Rhythm Recovery — Coming Soon",
+    title: "Rhythm Recovery",
     description,
     images: ["/og-image.png"],
   },
@@ -57,7 +57,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         <script

@@ -11,10 +11,7 @@ Key facts:
 - Identity is anonymous by default (auto-generated display name).
 - Progress is shown as streaks and milestone badges (90 days, 6 months,
   9 months, 1 year, 18 months, then annually), not a public leaderboard.
-- Users can optionally share a static snapshot (streak and milestone
-  progress only, never journal entries or contact details) via SMS or
-  email.
 - Recovery and journal data are treated as sensitive personal data.
 
-This site (rhythmrecovery.app) is a pre-launch landing page for early
-access sign-ups. The product itself has not shipped yet.
+This site (rhythmrecovery.app) is the product itself — create a free
+account to start tracking today.

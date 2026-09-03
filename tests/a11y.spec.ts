@@ -33,8 +33,16 @@ test("skip link is the first focusable element and jumps to main", async ({
   await expect(page.locator("#main")).toBeVisible();
 });
 
-test("sign-up form fields are reachable by keyboard", async ({ page }) => {
+test("homepage 'Create your account' link is reachable by keyboard", async ({ page }) => {
   await page.goto("/");
+
+  const cta = page.getByRole("link", { name: "Create your account" });
+  await cta.focus();
+  await expect(cta).toBeFocused();
+});
+
+test("sign-up form fields are reachable by keyboard", async ({ page }) => {
+  await page.goto("/signup");
 
   const emailInput = page.getByLabel("Email address");
   await emailInput.focus();

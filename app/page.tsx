@@ -1,4 +1,4 @@
-import SignupForm from "@/components/SignupForm";
+import Link from "next/link";
 
 export default function HomePage() {
   return (
@@ -15,8 +15,14 @@ export default function HomePage() {
         </p>
       </section>
 
-      <section className="signup" aria-label="Get early access">
-        <SignupForm />
+      <section className="signup" aria-label="Get started">
+        <h2>Get started</h2>
+        <Link href="/signup" className="ds-button ds-button--primary ds-button--block">
+          Create your account
+        </Link>
+        <p className="hint" style={{ textAlign: "center", marginTop: "1rem" }}>
+          Already have an account? <Link href="/login">Sign in</Link>
+        </p>
       </section>
     </main>
   );
