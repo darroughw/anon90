@@ -95,6 +95,8 @@ export default function RootLayout({
 
         <footer className="site-footer">
           <Link href="/privacy">Privacy Policy</Link>
+          {" · "}
+          <Link href="/terms">Terms of Service</Link>
           <div style={{ marginTop: "1rem", display: "flex", justifyContent: "center" }}>
             <ThemeToggle />
           </div>

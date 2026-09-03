@@ -6,7 +6,7 @@ import AxeBuilder from "@axe-core/playwright";
  * missing labels, and other WCAG 2.1 AA violations on every PR — they are
  * not a substitute for the periodic manual pass, see docs/accessibility.md.
  */
-const publicPages = ["/", "/privacy", "/login", "/signup"];
+const publicPages = ["/", "/privacy", "/terms", "/login", "/signup"];
 
 for (const path of publicPages) {
   test(`${path} has no WCAG 2.1 AA violations`, async ({ page }) => {

@@ -2,7 +2,7 @@
 
 *Draft for internal review — not legal advice. Have counsel review before publishing.*
 
-**Last updated:** [date]
+**Last updated:** September 3, 2026
 
 ## Overview
 
@@ -21,14 +21,12 @@ Rhythm Recovery ("we," "us") helps you track daily activities over a 90-day peri
 - Streak history and earned badges
 
 **Communication preferences**
-- Reminder settings (toast/email, timing)
+- Reminder settings (in-app and email reminders, each on or off independently)
+- Your timezone (used only to send reminders at the right local time)
 - Subscriber list status (opted in or out of product-update emails)
 
 **Usage analytics**
-- Aggregate, non-identifying usage data (e.g. feature usage, page views, session length) used solely to improve the product. We do not use analytics to build advertising profiles.
-
-**Sharing data**
-- If you choose to share your dashboard via text or email, we send the snapshot you select (streak, completion %, badges) to the recipient(s) you specify. We do not store recipient contact information beyond what's needed to send that one message.
+- Aggregate, non-identifying usage data (e.g. page views) via Vercel Analytics, used solely to improve the product. We do not use analytics to build advertising profiles.
 
 ## What We Don't Do
 
@@ -40,29 +38,36 @@ Rhythm Recovery ("we," "us") helps you track daily activities over a 90-day peri
 ## How We Use Information
 
 - To operate your account and the core tracking features
-- To send reminders and notifications you've opted into
-- To send product-update emails, only if you've opted in (unsubscribe available in every email and in account settings)
+- To send reminders you've opted into (in-app, email, or both)
+- To send product-update emails, only if you've opted in (unsubscribe available from account settings; a working one-click unsubscribe link is in every marketing email sent to a signed-in account — see Known gaps)
 - To improve the product via aggregate, non-identifying analytics
 - To respond to support requests
 
 ## Data Retention & Deletion
 
 - Your data is retained only as long as your account is active.
-- You can delete your account at any time; this permanently removes your profile, activity history, and preferences within [30] days.
+- You can delete your account at any time from your profile settings; this immediately and permanently removes your profile, activity history, and preferences.
 - Backups are purged on a rolling basis and do not persist deleted data indefinitely.
 
 ## Third-Party Services
 
-We use third-party infrastructure providers to operate the product (e.g. hosting, email delivery, SMS delivery, authentication). These providers process data only on our behalf, under contractual terms that prohibit them from using it for their own purposes.
+We use third-party infrastructure providers to operate the product. These providers process data only on our behalf, under contractual terms that prohibit them from using it for their own purposes:
 
-[List specific providers here once selected — e.g. hosting, email/SMS delivery, database, analytics.]
+- **Supabase** — authentication and the primary database (profiles, daily activity)
+- **Resend** — sends account and reminder emails
+- **Google** — "Continue with Google" sign-in, if you use it
+- **Vercel** — hosting and aggregate analytics
 
 ## Your Choices
 
-- Edit or delete your account and data at any time from settings
-- Change your anonymous username at any time
-- Opt in/out of subscriber emails independently from transactional/reminder emails
-- Control reminder channel and timing
+- Change your anonymous display name, sponsor status, and sobriety date at any time from your profile
+- Turn in-app and email reminders on or off independently
+- Opt in/out of product-update emails independently of reminders
+- Delete your account at any time from your profile
+
+## Known gaps (remove once resolved)
+
+- The pre-launch waitlist sign-up (before you have an account) doesn't have a working unsubscribe link yet — only marketing emails sent to a real account do.
 
 ## Children's Privacy
 
@@ -74,4 +79,4 @@ We'll notify users of material changes via email and update the "Last updated" d
 
 ## Contact
 
-[Support email / contact method]
+support@rhythmrecovery.app

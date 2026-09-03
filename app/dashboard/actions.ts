@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
 type UpdateProfileInput = {
@@ -51,5 +52,42 @@ export async function updateProfile(input: UpdateProfileInput): Promise<UpdatePr
   }
 
   revalidatePath("/dashboard");
+  return {};
+}
+
+type DeleteAccountResult = { error: string } | { error?: undefined };
+
+/**
+ * Permanently deletes the signed-in user's data and their Supabase auth
+ * account. Order matters: delete child rows before the parent, then the
+ * auth user last, so this is safe regardless of what (if any) cascading
+ * foreign keys exist between profiles and auth.users.
+ */
+export async function deleteAccount(): Promise<DeleteAccountResult> {
+  const supabase = await createClient();
+  const { data } = await supabase.auth.getClaims();
+  const userId = data?.claims?.sub as string | undefined;
+
+  if (!userId) {
+    return { error: "Your session expired. Sign in again." };
+  }
+
+  const admin = createAdminClient();
+
+  const { error: entriesError } = await admin.from("daily_entries").delete().eq("user_id", userId);
+  if (entriesError) {
+    return { error: entriesError.message };
+  }
+
+  const { error: profileError } = await admin.from("profiles").delete().eq("id", userId);
+  if (profileError) {
+    return { error: profileError.message };
+  }
+
+  const { error: authError } = await admin.auth.admin.deleteUser(userId);
+  if (authError) {
+    return { error: authError.message };
+  }
+
   return {};
 }

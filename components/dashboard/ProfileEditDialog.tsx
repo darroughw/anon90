@@ -3,9 +3,10 @@
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Alert, Badge, Button, Dialog, Divider, FormField, Input, ProgressBar, Switch } from "@/components/ui";
-import { updateProfile } from "@/app/dashboard/actions";
+import { deleteAccount, updateProfile } from "@/app/dashboard/actions";
 import { getNextMilestone, milestoneProgress } from "@/lib/milestones";
 import { getDailyQuote } from "@/lib/quotes";
+import { createClient } from "@/lib/supabase/client";
 import { daysSince } from "@/lib/streaks";
 
 type ProfileEditDialogProps = {
@@ -43,6 +44,9 @@ export default function ProfileEditDialog({
   const [marketingOptInValue, setMarketingOptInValue] = useState(marketingEmailsOptIn);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
 
   const now = today();
   const sober = daysSince(sobrietyDateValue, now);
@@ -72,6 +76,25 @@ export default function ProfileEditDialog({
 
     router.refresh();
     onClose();
+  }
+
+  async function handleDeleteAccount() {
+    setDeleteError("");
+    setDeleting(true);
+
+    const result = await deleteAccount();
+
+    if (result.error) {
+      setDeleting(false);
+      setDeleteError(result.error);
+      return;
+    }
+
+    // The account row is already gone server-side; this just clears the
+    // local session so the client stops thinking it's signed in.
+    await createClient().auth.signOut();
+    router.push("/login?deleted=1");
+    router.refresh();
   }
 
   return (
@@ -164,6 +187,47 @@ export default function ProfileEditDialog({
           Save changes
         </Button>
       </form>
+
+      <Divider />
+
+      {deleteError && (
+        <div style={{ marginBottom: "1rem" }}>
+          <Alert variant="error">{deleteError}</Alert>
+        </div>
+      )}
+
+      {!confirmingDelete ? (
+        <Button
+          type="button"
+          variant="ghost"
+          style={{ color: "var(--error)" }}
+          onClick={() => setConfirmingDelete(true)}
+        >
+          Delete account
+        </Button>
+      ) : (
+        <div>
+          <p className="hint" style={{ marginBottom: "1rem" }}>
+            This permanently deletes your profile, activity history, and preferences. It
+            can&apos;t be undone.
+          </p>
+          <div className="ds-row" style={{ gap: "0.75rem" }}>
+            <Button type="button" variant="secondary" onClick={() => setConfirmingDelete(false)}>
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              style={{ color: "var(--error)", borderColor: "var(--error)" }}
+              onClick={handleDeleteAccount}
+              disabled={deleting}
+              loading={deleting}
+            >
+              Yes, permanently delete my account
+            </Button>
+          </div>
+        </div>
+      )}
     </Dialog>
   );
 }

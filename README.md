@@ -28,6 +28,7 @@ The landing page and sign-up form work with no configuration (email address, log
 
 - `app/page.tsx` — landing page (logo, mission statement, early-access sign-up)
 - `app/privacy/page.tsx` — privacy policy page (kept in sync with [docs/privacy-policy.md](docs/privacy-policy.md))
+- `app/terms/page.tsx` — terms of service page (kept in sync with [docs/terms-of-service.md](docs/terms-of-service.md))
 - `app/login/`, `app/signup/` — Supabase email/password + Google OAuth sign-in
 - `app/onboarding/` — post-signup profile setup, redirects to `/dashboard` once a profile exists
 - `app/dashboard/` — the (early) authenticated app shell
@@ -54,7 +55,7 @@ The landing page and sign-up form work with no configuration (email address, log
 - `app/unsubscribe/` — one-click unsubscribe from marketing/subscriber emails, verifies a signed token, no login required
 - `supabase/migrations/` — schema changes, applied by hand via the Supabase SQL Editor (no `supabase` CLI linkage yet)
 - `emails/` — transactional email templates (see Email templates below)
-- `docs/` — product scope, mission/voice guide, privacy policy draft, accessibility process, logo source
+- `docs/` — product scope, mission/voice guide, privacy policy and terms of service drafts, accessibility process, logo source
 
 ## Google integration
 

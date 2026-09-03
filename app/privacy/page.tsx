@@ -16,7 +16,7 @@ export default function PrivacyPage() {
         </em>
       </p>
       <p>
-        <strong>Last updated:</strong> [date]
+        <strong>Last updated:</strong> September 3, 2026
       </p>
 
       <h2>Overview</h2>
@@ -54,7 +54,8 @@ export default function PrivacyPage() {
         <strong>Communication preferences</strong>
       </p>
       <ul>
-        <li>Reminder settings (toast/email, timing)</li>
+        <li>Reminder settings (in-app and email reminders, each on or off independently)</li>
+        <li>Your timezone (used only to send reminders at the right local time)</li>
         <li>Subscriber list status (opted in or out of product-update emails)</li>
       </ul>
 
@@ -62,19 +63,9 @@ export default function PrivacyPage() {
         <strong>Usage analytics</strong>
       </p>
       <p>
-        Aggregate, non-identifying usage data (e.g. feature usage, page
-        views, session length) used solely to improve the product. We do not
-        use analytics to build advertising profiles.
-      </p>
-
-      <p>
-        <strong>Sharing data</strong>
-      </p>
-      <p>
-        If you choose to share your dashboard via text or email, we send the
-        snapshot you select (streak, completion %, badges) to the
-        recipient(s) you specify. We do not store recipient contact
-        information beyond what&apos;s needed to send that one message.
+        Aggregate, non-identifying usage data (e.g. page views) via Vercel
+        Analytics, used solely to improve the product. We do not use
+        analytics to build advertising profiles.
       </p>
 
       <h2>What We Don&apos;t Do</h2>
@@ -94,10 +85,12 @@ export default function PrivacyPage() {
       <h2>How We Use Information</h2>
       <ul>
         <li>To operate your account and the core tracking features</li>
-        <li>To send reminders and notifications you&apos;ve opted into</li>
+        <li>To send reminders you&apos;ve opted into (in-app, email, or both)</li>
         <li>
           To send product-update emails, only if you&apos;ve opted in
-          (unsubscribe available in every email and in account settings)
+          (unsubscribe available from account settings; a working one-click
+          unsubscribe link is in every marketing email sent to a signed-in
+          account — see Known gaps)
         </li>
         <li>To improve the product via aggregate, non-identifying analytics</li>
         <li>To respond to support requests</li>
@@ -107,8 +100,9 @@ export default function PrivacyPage() {
       <ul>
         <li>Your data is retained only as long as your account is active.</li>
         <li>
-          You can delete your account at any time; this permanently removes
-          your profile, activity history, and preferences within [30] days.
+          You can delete your account at any time from your profile
+          settings; this immediately and permanently removes your profile,
+          activity history, and preferences.
         </li>
         <li>
           Backups are purged on a rolling basis and do not persist deleted
@@ -118,25 +112,45 @@ export default function PrivacyPage() {
 
       <h2>Third-Party Services</h2>
       <p>
-        We use third-party infrastructure providers to operate the product
-        (e.g. hosting, email delivery, SMS delivery, authentication). These
-        providers process data only on our behalf, under contractual terms
-        that prohibit them from using it for their own purposes.
+        We use third-party infrastructure providers to operate the product.
+        These providers process data only on our behalf, under contractual
+        terms that prohibit them from using it for their own purposes:
       </p>
-      <p>
-        [List specific providers here once selected, e.g. hosting, email/SMS
-        delivery, database, analytics.]
-      </p>
+      <ul>
+        <li>
+          <strong>Supabase</strong> — authentication and the primary database
+          (profiles, daily activity)
+        </li>
+        <li>
+          <strong>Resend</strong> — sends account and reminder emails
+        </li>
+        <li>
+          <strong>Google</strong> — &quot;Continue with Google&quot; sign-in,
+          if you use it
+        </li>
+        <li>
+          <strong>Vercel</strong> — hosting and aggregate analytics
+        </li>
+      </ul>
 
       <h2>Your Choices</h2>
       <ul>
-        <li>Edit or delete your account and data at any time from settings</li>
-        <li>Change your anonymous username at any time</li>
         <li>
-          Opt in/out of subscriber emails independently from
-          transactional/reminder emails
+          Change your anonymous display name, sponsor status, and sobriety
+          date at any time from your profile
         </li>
-        <li>Control reminder channel and timing</li>
+        <li>Turn in-app and email reminders on or off independently</li>
+        <li>Opt in/out of product-update emails independently of reminders</li>
+        <li>Delete your account at any time from your profile</li>
+      </ul>
+
+      <h2>Known gaps (remove once resolved)</h2>
+      <ul>
+        <li>
+          The pre-launch waitlist sign-up (before you have an account)
+          doesn&apos;t have a working unsubscribe link yet — only marketing
+          emails sent to a real account do.
+        </li>
       </ul>
 
       <h2>Children&apos;s Privacy</h2>
@@ -152,7 +166,9 @@ export default function PrivacyPage() {
       </p>
 
       <h2>Contact</h2>
-      <p>[Support email / contact method]</p>
+      <p>
+        <a href="mailto:support@rhythmrecovery.app">support@rhythmrecovery.app</a>
+      </p>
     </main>
   );
 }
