@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { Alert, Button, Checkbox, FormField, Input, Switch } from "@/components/ui";
+import { Alert, Button, Checkbox, FormField, Input } from "@/components/ui";
 import { completeOnboarding } from "./actions";
 
 type Step = 1 | 2 | 3;
@@ -115,10 +115,10 @@ export default function OnboardingWizard({ suggestedUsername }: { suggestedUsern
 
       {step === 3 && (
         <div>
-          <Switch
-            label="Do you have a sponsor?"
+          <Checkbox
+            label="I have a sponsor"
             checked={hasSponsor}
-            onCheckedChange={setHasSponsor}
+            onChange={(event) => setHasSponsor(event.target.checked)}
           />
           {!hasSponsor && (
             <p className="hint" style={{ marginTop: "0.75rem" }}>

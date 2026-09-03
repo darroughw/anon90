@@ -14,6 +14,7 @@ import {
   useToast,
 } from "@/components/ui";
 import ChecklistItem from "@/components/dashboard/ChecklistItem";
+import DailyProgressBar from "@/components/dashboard/DailyProgressBar";
 import DailyQuote from "@/components/dashboard/DailyQuote";
 import HelpfulLinks from "@/components/dashboard/HelpfulLinks";
 import MilestoneBadges from "@/components/dashboard/MilestoneBadges";
@@ -130,6 +131,7 @@ function DashboardInner({ profile }: { profile: Profile }) {
 
   const todayEntry = entries.find((entry) => entry.entry_date === today) ?? emptyEntry(today);
   const dayComplete = isEntryComplete(todayEntry);
+  const completedToday = CHECKLIST_FIELDS.filter((field) => todayEntry[field]).length;
 
   // Tracks whether today's completion state just flipped to true (as
   // opposed to loading in already-complete) so the celebration animation
@@ -300,6 +302,7 @@ function DashboardInner({ profile }: { profile: Profile }) {
           </svg>
         </div>
         <h2 style={{ marginTop: 0 }}>Today&apos;s checklist</h2>
+        <DailyProgressBar completed={completedToday} total={CHECKLIST_FIELDS.length} />
         {dayComplete && (
           <p className="hint" role="status" style={{ marginTop: "-0.5rem", marginBottom: "1rem" }}>
             Today&apos;s list is complete.
@@ -328,6 +331,12 @@ function DashboardInner({ profile }: { profile: Profile }) {
           <p className="ds-field__hint">{journalStatus}</p>
         </div>
       </Card>
+
+      <p className="hint" style={{ textAlign: "center", marginTop: "1rem" }}>
+        <a href="https://www.aa.org/daily-reflections" target="_blank" rel="noreferrer">
+          Read today&apos;s AA Daily Reflection
+        </a>
+      </p>
 
       <div style={{ marginTop: "2rem" }}>
         <HelpfulLinks />

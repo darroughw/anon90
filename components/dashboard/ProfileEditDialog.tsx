@@ -164,7 +164,11 @@ export default function ProfileEditDialog({
         </div>
 
         <div style={{ marginBottom: "0.75rem" }}>
-          <Switch label="I have a sponsor" checked={sponsorValue} onCheckedChange={setSponsorValue} />
+          <Checkbox
+            label="I have a sponsor"
+            checked={sponsorValue}
+            onChange={(event) => setSponsorValue(event.target.checked)}
+          />
         </div>
         <div style={{ marginBottom: "0.75rem" }}>
           <Checkbox
@@ -207,13 +211,8 @@ export default function ProfileEditDialog({
 
         <Divider />
 
-        <p className="hint" style={{ fontStyle: "italic", marginBottom: "0.5rem", marginTop: "1.25rem" }}>
+        <p className="hint" style={{ fontStyle: "italic", marginBottom: "1.5rem" }}>
           &ldquo;{getDailyQuote(now)}&rdquo;
-        </p>
-        <p className="hint" style={{ marginBottom: "1.5rem" }}>
-          <a href="https://www.aa.org/daily-reflections" target="_blank" rel="noreferrer">
-            Read today&apos;s AA Daily Reflection
-          </a>
         </p>
 
         <Button type="submit" className="ds-button--block" disabled={submitting} loading={submitting}>
