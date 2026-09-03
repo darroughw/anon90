@@ -158,15 +158,17 @@ export default function DashboardClient({ profile }: { profile: Profile }) {
 
   return (
     <div>
+      <h1 style={{ textAlign: "center", marginBottom: "0.75rem" }}>
+        Welcome back, {profile.username}
+      </h1>
       <div
         className="ds-row"
-        style={{ justifyContent: "center", alignItems: "baseline", gap: "0.75rem" }}
+        style={{ justifyContent: "center", gap: "0.75rem", marginBottom: "1.5rem" }}
       >
-        <h1 style={{ textAlign: "center" }}>Welcome back, {profile.username}</h1>
-        <Button variant="ghost" onClick={() => setEditingProfile(true)}>
+        <Button variant="secondary" onClick={() => setEditingProfile(true)}>
           Edit profile
         </Button>
-        <Button variant="ghost" onClick={handleLogOut}>
+        <Button variant="secondary" onClick={handleLogOut}>
           Log out
         </Button>
       </div>
