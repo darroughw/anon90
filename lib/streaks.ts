@@ -95,6 +95,27 @@ export function calculateDayStreak(
   return streak;
 }
 
+export type DayStatus = { date: string; complete: boolean };
+
+/** Completion status for the last `days` days, oldest first, today last. */
+export function recentCompletionHistory(
+  items: ChecklistItem[],
+  completions: Completion[],
+  today: string,
+  days: number,
+): DayStatus[] {
+  const completedByDate = groupCompletedIdsByDate(completions);
+  const empty = new Set<string>();
+  const history: DayStatus[] = [];
+
+  for (let i = days - 1; i >= 0; i--) {
+    const date = shiftDate(today, -i);
+    history.push({ date, complete: isDateComplete(items, completedByDate.get(date) ?? empty, date) });
+  }
+
+  return history;
+}
+
 /** First pass: whole completed 7-day blocks within the current day streak. */
 export function calculateWeekStreak(dayStreak: number): number {
   return Math.floor(dayStreak / 7);

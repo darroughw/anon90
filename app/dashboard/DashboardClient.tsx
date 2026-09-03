@@ -22,6 +22,7 @@ import HelpfulLinks from "@/components/dashboard/HelpfulLinks";
 import JournalEcho from "@/components/dashboard/JournalEcho";
 import MilestoneBadges from "@/components/dashboard/MilestoneBadges";
 import ProfileEditDialog from "@/components/dashboard/ProfileEditDialog";
+import RhythmStreak from "@/components/dashboard/RhythmStreak";
 import { anniversaryCandidateDates, matchAnniversaries, type JournalAnniversary } from "@/lib/journal";
 import { getEarnedMilestones, getNextMilestone, milestoneProgress } from "@/lib/milestones";
 import { createClient } from "@/lib/supabase/client";
@@ -30,6 +31,7 @@ import {
   calculateWeekStreak,
   daysSince,
   isDateComplete,
+  recentCompletionHistory,
   requiredItemsForDate,
   type ChecklistItem as ChecklistItemType,
   type Completion,
@@ -202,6 +204,7 @@ function DashboardInner({ profile }: { profile: Profile }) {
 
   const dayStreak = calculateDayStreak(items, completions, today);
   const weekStreak = calculateWeekStreak(dayStreak);
+  const rhythmHistory = recentCompletionHistory(items, completions, today, 21);
   const sober = daysSince(profile.sobriety_date, today);
   const milestone = getNextMilestone(sober);
   const progress = milestoneProgress(sober, milestone);
@@ -285,10 +288,10 @@ function DashboardInner({ profile }: { profile: Profile }) {
       )}
 
       <div className="ds-row" style={{ justifyContent: "center", marginBottom: "1.5rem" }}>
-        <StatDisplay value={dayStreak} label="Day streak" />
-        <StatDisplay value={weekStreak} label="Week streak" />
         <StatDisplay value={sober} label="Days sober" />
       </div>
+
+      <RhythmStreak dayStreak={dayStreak} weekStreak={weekStreak} history={rhythmHistory} />
 
       <div style={{ marginBottom: "2rem" }}>
         <div className="ds-row" style={{ justifyContent: "space-between", marginBottom: "0.5rem" }}>

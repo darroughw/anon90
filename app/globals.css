@@ -804,6 +804,46 @@ button[type="submit"]:disabled {
   color: var(--fg-muted);
 }
 
+/* Rhythm streak (echoes the logo's waveform icon, same idea as
+   .ds-daily-progress but as a history strip instead of a single fill).
+   Bar height is a fixed decorative pattern, not data -- only fill color
+   encodes complete vs. missed, so the "rhythm" reads the same regardless
+   of which days happen to be on or off. */
+.ds-rhythm__strip {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 64px;
+}
+
+.ds-rhythm__bar {
+  flex: 1 1 0;
+  min-width: 3px;
+  border-radius: 3px 3px 1px 1px;
+  background: var(--chip-bg);
+  transition: transform 0.15s ease;
+}
+
+.ds-rhythm__bar--on {
+  background: linear-gradient(180deg, rgba(var(--warm-glow-rgb), 0.95), rgba(var(--warm-glow-rgb), 0.6));
+}
+
+.ds-rhythm__bar--today.ds-rhythm__bar--on {
+  box-shadow: 0 0 14px rgba(var(--warm-glow-rgb), 0.55);
+}
+
+.ds-rhythm__bar:hover {
+  transform: scaleY(1.08);
+}
+
+.ds-rhythm__axis {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--fg-muted);
+}
+
 .ds-avatar {
   display: inline-flex;
   align-items: center;
