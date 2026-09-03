@@ -7,6 +7,9 @@ type UpdateProfileInput = {
   username: string;
   hasSponsor: boolean;
   sobrietyDate: string;
+  reminderToastEnabled: boolean;
+  reminderEmailEnabled: boolean;
+  marketingEmailsOptIn: boolean;
 };
 
 type UpdateProfileResult = { error: string } | { error?: undefined };
@@ -33,7 +36,14 @@ export async function updateProfile(input: UpdateProfileInput): Promise<UpdatePr
 
   const { error } = await supabase
     .from("profiles")
-    .update({ username, has_sponsor: input.hasSponsor, sobriety_date: input.sobrietyDate })
+    .update({
+      username,
+      has_sponsor: input.hasSponsor,
+      sobriety_date: input.sobrietyDate,
+      reminder_toast_enabled: input.reminderToastEnabled,
+      reminder_email_enabled: input.reminderEmailEnabled,
+      marketing_emails_opt_in: input.marketingEmailsOptIn,
+    })
     .eq("id", userId);
 
   if (error) {

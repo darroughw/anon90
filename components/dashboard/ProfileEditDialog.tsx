@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { Alert, Badge, Button, Dialog, FormField, Input, ProgressBar, Switch } from "@/components/ui";
+import { Alert, Badge, Button, Dialog, Divider, FormField, Input, ProgressBar, Switch } from "@/components/ui";
 import { updateProfile } from "@/app/dashboard/actions";
 import { getNextMilestone, milestoneProgress } from "@/lib/milestones";
 import { getDailyQuote } from "@/lib/quotes";
@@ -14,6 +14,9 @@ type ProfileEditDialogProps = {
   username: string;
   hasSponsor: boolean;
   sobrietyDate: string;
+  reminderToastEnabled: boolean;
+  reminderEmailEnabled: boolean;
+  marketingEmailsOptIn: boolean;
 };
 
 function today(): string {
@@ -27,11 +30,17 @@ export default function ProfileEditDialog({
   username,
   hasSponsor,
   sobrietyDate,
+  reminderToastEnabled,
+  reminderEmailEnabled,
+  marketingEmailsOptIn,
 }: ProfileEditDialogProps) {
   const router = useRouter();
   const [usernameValue, setUsernameValue] = useState(username);
   const [sponsorValue, setSponsorValue] = useState(hasSponsor);
   const [sobrietyDateValue, setSobrietyDateValue] = useState(sobrietyDate);
+  const [reminderToastValue, setReminderToastValue] = useState(reminderToastEnabled);
+  const [reminderEmailValue, setReminderEmailValue] = useState(reminderEmailEnabled);
+  const [marketingOptInValue, setMarketingOptInValue] = useState(marketingEmailsOptIn);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -49,6 +58,9 @@ export default function ProfileEditDialog({
       username: usernameValue,
       hasSponsor: sponsorValue,
       sobrietyDate: sobrietyDateValue,
+      reminderToastEnabled: reminderToastValue,
+      reminderEmailEnabled: reminderEmailValue,
+      marketingEmailsOptIn: marketingOptInValue,
     });
 
     setSubmitting(false);
@@ -113,7 +125,33 @@ export default function ProfileEditDialog({
           <Switch label="I have a sponsor" checked={sponsorValue} onCheckedChange={setSponsorValue} />
         </div>
 
-        <p className="hint" style={{ fontStyle: "italic", marginBottom: "0.5rem" }}>
+        <Divider />
+
+        <div style={{ marginBottom: "0.75rem" }}>
+          <Switch
+            label="Remind me in-app if today's list is still open"
+            checked={reminderToastValue}
+            onCheckedChange={setReminderToastValue}
+          />
+        </div>
+        <div style={{ marginBottom: "0.75rem" }}>
+          <Switch
+            label="Email me if today's list is still open"
+            checked={reminderEmailValue}
+            onCheckedChange={setReminderEmailValue}
+          />
+        </div>
+        <div style={{ marginBottom: "1.25rem" }}>
+          <Switch
+            label="Send me product updates and tips"
+            checked={marketingOptInValue}
+            onCheckedChange={setMarketingOptInValue}
+          />
+        </div>
+
+        <Divider />
+
+        <p className="hint" style={{ fontStyle: "italic", marginBottom: "0.5rem", marginTop: "1.25rem" }}>
           &ldquo;{getDailyQuote(now)}&rdquo;
         </p>
         <p className="hint" style={{ marginBottom: "1.5rem" }}>

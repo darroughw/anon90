@@ -47,6 +47,7 @@ export default function OnboardingWizard({ suggestedUsername }: { suggestedUsern
       username: username.trim(),
       sobrietyDate,
       hasSponsor,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     });
     if (result?.error) {
       setError(result.error);

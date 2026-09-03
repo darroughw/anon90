@@ -43,7 +43,14 @@ The landing page and sign-up form work with no configuration (email address, log
 - `lib/verifyGoogleToken.ts` — verifies a Google Sign-In ID token server-side
 - `lib/googleSheets.ts` — appends a signup row to a Google Sheet via a service account
 - `lib/streaks.ts`, `lib/milestones.ts`, `lib/generateUsername.ts` — core-loop helpers used by onboarding/dashboard
+- `lib/quotes.ts`, `lib/helpfulLinks.ts` — dashboard content (daily quote, curated resource links)
+- `lib/timezone.ts` — local-hour/local-date helpers for a given IANA timezone, used server-side (no "device" in a cron job) to compute each user's day boundary
+- `lib/unsubscribeToken.ts` — signs/verifies the token used by `/unsubscribe`
+- `lib/supabase/admin.ts` — service-role client for server-only code with no user session (the reminders cron, `/unsubscribe`)
 - `proxy.ts` — root middleware: gates `/login`, `/signup`, `/onboarding`, `/dashboard`, `/auth` behind Basic Auth on preview/dev deployments (via `DEV_BASIC_AUTH_PASSWORD`), then refreshes the Supabase session
+- `app/api/cron/reminders/route.tsx` — hourly (see `vercel.json`): emails users whose local time is 9pm and whose checklist for the day isn't complete
+- `app/unsubscribe/` — one-click unsubscribe from marketing/subscriber emails, verifies a signed token, no login required
+- `supabase/migrations/` — schema changes, applied by hand via the Supabase SQL Editor (no `supabase` CLI linkage yet)
 - `emails/` — transactional email templates (see Email templates below)
 - `docs/` — product scope, mission/voice guide, privacy policy draft, accessibility process, logo source
 
@@ -58,11 +65,13 @@ Without these, the Google button doesn't render and the API route falls back to 
 
 ## Email templates
 
-Built with [react-email](https://react.email), matching the voice guide (plain, no outcome promises, no hype):
+Built with [react-email](https://react.email) and sent via [Resend](https://resend.com), matching the voice guide (plain, no outcome promises, no hype):
 
-- `emails/confirmation.tsx` — sent right after someone registers on the landing page
-- `emails/launch.tsx` — sent to the list when the app is actually ready
-- `emails/components/EmailLayout.tsx` — shared shell (logo, footer, privacy link, unsubscribe link)
+- `emails/confirmation.tsx` — sent right after someone registers on the landing page (transactional/subscriber — see Email system below)
+- `emails/launch.tsx` — for the list when the app is ready; not wired to an actual send yet (no bulk-send/campaign tooling built)
+- `emails/authAction.tsx` — signup confirmation, password reset, magic link, email change — sent via a Supabase Auth "Send Email" hook (`app/api/auth/send-email/route.tsx`) instead of Supabase's default sender/template
+- `emails/reminder.tsx` — the email half of Reminders, sent by `app/api/cron/reminders/route.tsx`
+- `emails/components/EmailLayout.tsx` — shared shell (logo, footer, privacy link, optional unsubscribe link)
 
 Preview them locally:
 
@@ -70,16 +79,29 @@ Preview them locally:
 npm run email:dev
 ```
 
-Opens a browser preview at [http://localhost:3000](http://localhost:3000) (react-email's own dev server, separate from `next dev`) with live reload and per-client compatibility warnings.
-
-Neither template is wired to actual sending yet — that's blocked on the same email provider decision as the rest of the email system (see docs/mvp-scope.md → Open Decisions). Once a provider is chosen, render these with `@react-email/render`'s `render()` and pass the resulting HTML to that provider's send call; `subject` is exported from each template file for convenience.
+Opens a browser preview (react-email's own dev server, separate from `next dev`, on the next free port) with live reload and per-client compatibility warnings.
 
 The email logo (`public/email/logo.png`) is a separate asset from the site logo: same mark, rendered in `--rr-sienna` (`#A0522D`) on a transparent background instead of the site's near-black or cream, since email clients can render either a white or a dark surface behind it and a single mid-tone reads on both. Regenerate it from `public/assets/logo/rhythm-recovery.svg` if the logo changes (swap `#F2E9DD` for `#A0522D` and re-rasterize at 480×340).
 
+## Email system
+
+Per docs/mvp-scope.md, transactional and marketing/subscriber emails are kept separate:
+
+- **Transactional** (`authAction.tsx`, `reminder.tsx`) — tied to core product function, no unsubscribe link; users control reminders via the per-channel toggles in the profile-edit dialog instead.
+- **Marketing/subscriber** (`confirmation.tsx`, `launch.tsx`) — explicit opt-in (`profiles.marketing_emails_opt_in`, off by default) and one-click unsubscribe (`app/unsubscribe/`, token-verified, no login required). This only covers registered users — the pre-launch waitlist (Google Sheets-backed, see Google integration) has no working unsubscribe yet, since there's no per-row status to update there; that's expected to go away once Sheets is replaced as the capture mechanism.
+
+## Reminders & cron
+
+`app/api/cron/reminders/route.tsx` runs hourly via Vercel Cron (`vercel.json`) and requires a `CRON_SECRET` env var — Vercel automatically sends it as `Authorization: Bearer $CRON_SECRET` when invoking scheduled functions; the route rejects anything else. Cron jobs don't run under `next dev`; to test locally, call the route directly with that header.
+
+A user's local day boundary (used both for the dashboard's `localToday()` and for this cron job) relies on `profiles.timezone`, captured once at onboarding via `Intl.DateTimeFormat().resolvedOptions().timeZone`. There's no UI to change it after signup yet.
+
 ## Known gaps
 
-- `[date]`, `[30]`, and `[Support email / contact method]` in the privacy policy are placeholders pending legal review and provider decisions.
-- The final production email/SMS provider choice is still open (see docs/mvp-scope.md → Open Decisions); Google Sheets is a temporary landing-page capture point, not the long-term data store.
+- `[date]`, `[30]`, and `[Support email / contact method]` in the privacy policy are placeholders pending legal review.
+- `supabase/migrations/` isn't applied automatically — there's no `supabase` CLI project link, so new migrations need to be pasted into the Supabase SQL Editor by hand.
+- The pre-launch waitlist (Google Sheets) has no working unsubscribe (see Email system above).
+- `profiles.timezone` has no settings-page UI to change after onboarding.
 
 ## CI & accessibility
 

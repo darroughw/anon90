@@ -1,8 +1,19 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Alert, Badge, Button, Card, Checkbox, ProgressBar, StatDisplay, Textarea } from "@/components/ui";
+import {
+  Alert,
+  Badge,
+  Button,
+  Card,
+  Checkbox,
+  ProgressBar,
+  StatDisplay,
+  Textarea,
+  ToastProvider,
+  useToast,
+} from "@/components/ui";
 import DailyQuote from "@/components/dashboard/DailyQuote";
 import HelpfulLinks from "@/components/dashboard/HelpfulLinks";
 import MilestoneBadges from "@/components/dashboard/MilestoneBadges";
@@ -14,6 +25,7 @@ import {
   calculateDayStreak,
   calculateWeekStreak,
   daysSince,
+  isEntryComplete,
   type ChecklistField,
   type DailyEntry,
 } from "@/lib/streaks";
@@ -32,6 +44,9 @@ type Profile = {
   username: string;
   sobriety_date: string;
   has_sponsor: boolean;
+  reminder_toast_enabled: boolean;
+  reminder_email_enabled: boolean;
+  marketing_emails_opt_in: boolean;
 };
 
 type EntryRow = DailyEntry & { journal: string };
@@ -56,10 +71,12 @@ function emptyEntry(date: string): EntryRow {
   };
 }
 
-export default function DashboardClient({ profile }: { profile: Profile }) {
+function DashboardInner({ profile }: { profile: Profile }) {
   const router = useRouter();
+  const { showToast } = useToast();
   const supabase = useMemo(() => createClient(), []);
   const today = useMemo(() => localToday(), []);
+  const reminded = useRef(false);
 
   const [userId, setUserId] = useState<string | null>(null);
   const [entries, setEntries] = useState<EntryRow[]>([]);
@@ -110,6 +127,15 @@ export default function DashboardClient({ profile }: { profile: Profile }) {
   }, [supabase, today]);
 
   const todayEntry = entries.find((entry) => entry.entry_date === today) ?? emptyEntry(today);
+
+  useEffect(() => {
+    if (loading || reminded.current || !profile.reminder_toast_enabled) return;
+    if (new Date().getHours() < 21) return;
+    if (isEntryComplete(todayEntry)) return;
+
+    reminded.current = true;
+    showToast("It's later in the day. A few tasks are still open on today's list.");
+  }, [loading, profile.reminder_toast_enabled, todayEntry, showToast]);
 
   async function toggleField(field: ChecklistField) {
     if (!userId) return;
@@ -182,6 +208,9 @@ export default function DashboardClient({ profile }: { profile: Profile }) {
         username={profile.username}
         hasSponsor={profile.has_sponsor}
         sobrietyDate={profile.sobriety_date}
+        reminderToastEnabled={profile.reminder_toast_enabled}
+        reminderEmailEnabled={profile.reminder_email_enabled}
+        marketingEmailsOptIn={profile.marketing_emails_opt_in}
       />
 
       {error && (
@@ -244,5 +273,13 @@ export default function DashboardClient({ profile }: { profile: Profile }) {
         <HelpfulLinks />
       </div>
     </div>
+  );
+}
+
+export default function DashboardClient({ profile }: { profile: Profile }) {
+  return (
+    <ToastProvider>
+      <DashboardInner profile={profile} />
+    </ToastProvider>
   );
 }

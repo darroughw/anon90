@@ -7,6 +7,7 @@ type CompleteOnboardingInput = {
   username: string;
   sobrietyDate: string;
   hasSponsor: boolean;
+  timezone: string;
 };
 
 export async function completeOnboarding(input: CompleteOnboardingInput) {
@@ -24,6 +25,7 @@ export async function completeOnboarding(input: CompleteOnboardingInput) {
     username: input.username,
     sobriety_date: input.sobrietyDate,
     has_sponsor: input.hasSponsor,
+    timezone: input.timezone,
   });
 
   if (error) {
