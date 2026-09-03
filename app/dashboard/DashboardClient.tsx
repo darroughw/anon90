@@ -1,8 +1,13 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Alert, Badge, Card, Checkbox, ProgressBar, StatDisplay, Textarea } from "@/components/ui";
-import { getNextMilestone, milestoneProgress } from "@/lib/milestones";
+import { useRouter } from "next/navigation";
+import { Alert, Badge, Button, Card, Checkbox, ProgressBar, StatDisplay, Textarea } from "@/components/ui";
+import DailyQuote from "@/components/dashboard/DailyQuote";
+import HelpfulLinks from "@/components/dashboard/HelpfulLinks";
+import MilestoneBadges from "@/components/dashboard/MilestoneBadges";
+import ProfileEditDialog from "@/components/dashboard/ProfileEditDialog";
+import { getEarnedMilestones, getNextMilestone, milestoneProgress } from "@/lib/milestones";
 import { createClient } from "@/lib/supabase/client";
 import {
   CHECKLIST_FIELDS,
@@ -52,6 +57,7 @@ function emptyEntry(date: string): EntryRow {
 }
 
 export default function DashboardClient({ profile }: { profile: Profile }) {
+  const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
   const today = useMemo(() => localToday(), []);
 
@@ -61,6 +67,7 @@ export default function DashboardClient({ profile }: { profile: Profile }) {
   const [loading, setLoading] = useState(true);
   const [journalStatus, setJournalStatus] = useState("");
   const [error, setError] = useState("");
+  const [editingProfile, setEditingProfile] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -132,11 +139,18 @@ export default function DashboardClient({ profile }: { profile: Profile }) {
     setJournalStatus(upsertError ? "Couldn't save." : "Saved");
   }
 
+  async function handleLogOut() {
+    await supabase.auth.signOut();
+    router.push("/login");
+    router.refresh();
+  }
+
   const dayStreak = calculateDayStreak(entries, today);
   const weekStreak = calculateWeekStreak(dayStreak);
   const sober = daysSince(profile.sobriety_date, today);
   const milestone = getNextMilestone(sober);
   const progress = milestoneProgress(sober, milestone);
+  const earnedMilestones = getEarnedMilestones(sober);
 
   if (loading) {
     return <p className="hint">Loading...</p>;
@@ -144,7 +158,29 @@ export default function DashboardClient({ profile }: { profile: Profile }) {
 
   return (
     <div>
-      <h1 style={{ textAlign: "center" }}>Welcome back, {profile.username}</h1>
+      <div
+        className="ds-row"
+        style={{ justifyContent: "center", alignItems: "baseline", gap: "0.75rem" }}
+      >
+        <h1 style={{ textAlign: "center" }}>Welcome back, {profile.username}</h1>
+        <Button variant="ghost" onClick={() => setEditingProfile(true)}>
+          Edit profile
+        </Button>
+        <Button variant="ghost" onClick={handleLogOut}>
+          Log out
+        </Button>
+      </div>
+
+      <DailyQuote date={today} />
+
+      <ProfileEditDialog
+        key={editingProfile ? "open" : "closed"}
+        open={editingProfile}
+        onClose={() => setEditingProfile(false)}
+        username={profile.username}
+        hasSponsor={profile.has_sponsor}
+        sobrietyDate={profile.sobriety_date}
+      />
 
       {error && (
         <div style={{ marginBottom: "1.5rem" }}>
@@ -174,6 +210,8 @@ export default function DashboardClient({ profile }: { profile: Profile }) {
         <ProgressBar value={progress} label={`Progress toward ${milestone.label}`} />
       </div>
 
+      <MilestoneBadges earned={earnedMilestones} />
+
       <Card>
         <h2 style={{ marginTop: 0 }}>Today&apos;s checklist</h2>
         {CHECKLIST_FIELDS.map((field) => (
@@ -199,6 +237,10 @@ export default function DashboardClient({ profile }: { profile: Profile }) {
           <p className="ds-field__hint">{journalStatus}</p>
         </div>
       </Card>
+
+      <div style={{ marginTop: "2rem" }}>
+        <HelpfulLinks />
+      </div>
     </div>
   );
 }

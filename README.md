@@ -74,7 +74,7 @@ Opens a browser preview at [http://localhost:3000](http://localhost:3000) (react
 
 Neither template is wired to actual sending yet — that's blocked on the same email provider decision as the rest of the email system (see docs/mvp-scope.md → Open Decisions). Once a provider is chosen, render these with `@react-email/render`'s `render()` and pass the resulting HTML to that provider's send call; `subject` is exported from each template file for convenience.
 
-The email logo (`public/email/logo.png`) is a separate dark-on-transparent asset from the site logo, generated for readability on the white/light backgrounds most email clients render by default — regenerate it from `public/assets/logo/rhythm-recovery.svg` if the logo changes.
+The email logo (`public/email/logo.png`) is a separate asset from the site logo: same mark, rendered in `--rr-sienna` (`#A0522D`) on a transparent background instead of the site's near-black or cream, since email clients can render either a white or a dark surface behind it and a single mid-tone reads on both. Regenerate it from `public/assets/logo/rhythm-recovery.svg` if the logo changes (swap `#F2E9DD` for `#A0522D` and re-rasterize at 480×340).
 
 ## Known gaps
 
