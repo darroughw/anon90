@@ -1,6 +1,4 @@
-# Terms of Service (Draft)
-
-*Draft for internal review — not legal advice. Have counsel review before publishing.*
+# Terms of Service
 
 **Last updated:** September 3, 2026
 
@@ -16,7 +14,7 @@ If you are in crisis or considering harming yourself, contact the 988 Suicide & 
 
 ## Eligibility
 
-You must be at least [13 / 16 / 18 — pick one; consistent with the age in the privacy policy's Children's Privacy section] years old to create an account. [Given the subject matter, worth a deliberate call rather than defaulting to the lowest legal minimum — flagging for you/counsel rather than picking one.]
+You must be at least 18 years old to create an account.
 
 ## Your Account
 
@@ -50,11 +48,13 @@ The service is provided "as is," without warranties of any kind, express or impl
 
 ## Limitation of Liability
 
-To the maximum extent permitted by law, Rhythm Recovery and its operators aren't liable for indirect, incidental, or consequential damages arising from your use of the service. [This section and any liability cap amount need counsel — don't treat the boilerplate here as sufficient on its own.]
+To the maximum extent permitted by law, Rhythm Recovery and its operators aren't liable for indirect, incidental, special, consequential, or punitive damages, or any loss of data, arising from your use of the service. Our total liability for any claim arising from these terms or the service is limited to the greater of $100 or the amount you paid us in the 12 months before the claim arose.
 
 ## Governing Law & Disputes
 
-[Placeholder — governing state/jurisdiction and whether disputes go through arbitration or courts are business/legal decisions that need to be made deliberately, not defaulted. Have counsel draft this section.]
+These terms are governed by the laws of the State of North Carolina, without regard to its conflict-of-laws principles.
+
+Any dispute arising from these terms or your use of the service will be resolved through binding individual arbitration administered by the American Arbitration Association under its Consumer Arbitration Rules, rather than in court, except that either party may bring an individual claim in small claims court if it qualifies. You and Rhythm Recovery each waive the right to a jury trial and to participate in a class action or class arbitration.
 
 ## Changes to These Terms
 

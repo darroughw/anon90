@@ -8,13 +8,7 @@ export const metadata: Metadata = {
 export default function TermsPage() {
   return (
     <main id="main" className="policy">
-      <h1>Terms of Service (Draft)</h1>
-      <p>
-        <em>
-          Draft for internal review, not legal advice. Have counsel review
-          before publishing.
-        </em>
-      </p>
+      <h1>Terms of Service</h1>
       <p>
         <strong>Last updated:</strong> September 3, 2026
       </p>
@@ -43,13 +37,7 @@ export default function TermsPage() {
       </p>
 
       <h2>Eligibility</h2>
-      <p>
-        You must be at least [13 / 16 / 18 — pick one; consistent with the
-        age in the Privacy Policy&apos;s Children&apos;s Privacy section]
-        years old to create an account. Given the subject matter, this is
-        worth a deliberate call rather than defaulting to the lowest legal
-        minimum.
-      </p>
+      <p>You must be at least 18 years old to create an account.</p>
 
       <h2>Your Account</h2>
       <ul>
@@ -122,18 +110,28 @@ export default function TermsPage() {
       <h2>Limitation of Liability</h2>
       <p>
         To the maximum extent permitted by law, Rhythm Recovery and its
-        operators aren&apos;t liable for indirect, incidental, or
-        consequential damages arising from your use of the service. This
-        section and any liability cap amount need counsel — don&apos;t treat
-        the boilerplate here as sufficient on its own.
+        operators aren&apos;t liable for indirect, incidental, special,
+        consequential, or punitive damages, or any loss of data, arising
+        from your use of the service. Our total liability for any claim
+        arising from these terms or the service is limited to the greater
+        of $100 or the amount you paid us in the 12 months before the claim
+        arose.
       </p>
 
       <h2>Governing Law &amp; Disputes</h2>
       <p>
-        [Placeholder — governing state/jurisdiction and whether disputes go
-        through arbitration or courts are business/legal decisions that need
-        to be made deliberately, not defaulted. Have counsel draft this
-        section.]
+        These terms are governed by the laws of the State of North
+        Carolina, without regard to its conflict-of-laws principles.
+      </p>
+      <p>
+        Any dispute arising from these terms or your use of the service
+        will be resolved through binding individual arbitration
+        administered by the American Arbitration Association under its
+        Consumer Arbitration Rules, rather than in court, except that
+        either party may bring an individual claim in small claims court
+        if it qualifies. You and Rhythm Recovery each waive the right to a
+        jury trial and to participate in a class action or class
+        arbitration.
       </p>
 
       <h2>Changes to These Terms</h2>

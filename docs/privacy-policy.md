@@ -1,6 +1,4 @@
-# Privacy Policy (Draft)
-
-*Draft for internal review — not legal advice. Have counsel review before publishing.*
+# Privacy Policy
 
 **Last updated:** September 3, 2026
 
@@ -39,7 +37,7 @@ Rhythm Recovery ("we," "us") helps you track daily activities over a 90-day peri
 
 - To operate your account and the core tracking features
 - To send reminders you've opted into (in-app, email, or both)
-- To send product-update emails, only if you've opted in (unsubscribe available from account settings; a working one-click unsubscribe link is in every marketing email sent to a signed-in account — see Known gaps)
+- To send product-update emails, only if you've opted in (unsubscribe available from account settings, and from a one-click link in every marketing email sent to a signed-in account)
 - To improve the product via aggregate, non-identifying analytics
 - To respond to support requests
 
@@ -64,10 +62,6 @@ We use third-party infrastructure providers to operate the product. These provid
 - Turn in-app and email reminders on or off independently
 - Opt in/out of product-update emails independently of reminders
 - Delete your account at any time from your profile
-
-## Known gaps (remove once resolved)
-
-- The pre-launch waitlist sign-up (before you have an account) doesn't have a working unsubscribe link yet — only marketing emails sent to a real account do.
 
 ## Children's Privacy
 

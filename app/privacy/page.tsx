@@ -8,13 +8,7 @@ export const metadata: Metadata = {
 export default function PrivacyPage() {
   return (
     <main id="main" className="policy">
-      <h1>Privacy Policy (Draft)</h1>
-      <p>
-        <em>
-          Draft for internal review, not legal advice. Have counsel review
-          before publishing.
-        </em>
-      </p>
+      <h1>Privacy Policy</h1>
       <p>
         <strong>Last updated:</strong> September 3, 2026
       </p>
@@ -88,9 +82,8 @@ export default function PrivacyPage() {
         <li>To send reminders you&apos;ve opted into (in-app, email, or both)</li>
         <li>
           To send product-update emails, only if you&apos;ve opted in
-          (unsubscribe available from account settings; a working one-click
-          unsubscribe link is in every marketing email sent to a signed-in
-          account — see Known gaps)
+          (unsubscribe available from account settings, and from a one-click
+          link in every marketing email sent to a signed-in account)
         </li>
         <li>To improve the product via aggregate, non-identifying analytics</li>
         <li>To respond to support requests</li>
@@ -142,15 +135,6 @@ export default function PrivacyPage() {
         <li>Turn in-app and email reminders on or off independently</li>
         <li>Opt in/out of product-update emails independently of reminders</li>
         <li>Delete your account at any time from your profile</li>
-      </ul>
-
-      <h2>Known gaps (remove once resolved)</h2>
-      <ul>
-        <li>
-          The pre-launch waitlist sign-up (before you have an account)
-          doesn&apos;t have a working unsubscribe link yet — only marketing
-          emails sent to a real account do.
-        </li>
       </ul>
 
       <h2>Children&apos;s Privacy</h2>
