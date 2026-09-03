@@ -4,7 +4,8 @@
   --fg-muted: rgba(242, 233, 221, 0.72);
   --border: rgba(242, 233, 221, 0.24);
   --border-interactive: rgba(242, 233, 221, 0.4);
-  --glow: 0 0 24px rgba(242, 233, 221, 0.25);
+  --glow-rgb: 242, 233, 221;
+  --glow: 0 0 24px rgba(var(--glow-rgb), 0.25);
   --radius: 6px;
   --error: #e2827e;
   --chip-bg: rgba(242, 233, 221, 0.06);
@@ -14,6 +15,29 @@
   --overlay-active: rgba(242, 233, 221, 0.16);
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+/*
+ * Light palette (docs/mvp-scope.md -> Color Palette). Same near-black/cream
+ * pair as dark mode, inverted -- see ANO-14. Contrast-checked against
+ * --rr-cream: near-black 15.4:1, espresso 11.2:1, the adjusted error red
+ * 5.6:1 (the dark-mode error color only clears 2.3:1 on cream, well under
+ * AA for the text it's used for).
+ */
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f2e9dd;
+  --fg: #1a120b;
+  --fg-muted: #3d2b1f;
+  --border: rgba(26, 18, 11, 0.18);
+  --border-interactive: rgba(26, 18, 11, 0.32);
+  --glow-rgb: 26, 18, 11;
+  --error: #a3352d;
+  --chip-bg: rgba(26, 18, 11, 0.05);
+  --fg-hover: #241a10;
+  --fg-active: #2e2216;
+  --overlay-hover: rgba(26, 18, 11, 0.08);
+  --overlay-active: rgba(26, 18, 11, 0.14);
 }
 
 * {
@@ -89,6 +113,18 @@ input:focus-visible {
   width: 100%;
   max-width: 600px;
   height: auto;
+  display: block;
+}
+
+.logo-light {
+  display: none;
+}
+
+:root[data-theme="light"] .logo-dark {
+  display: none;
+}
+
+:root[data-theme="light"] .logo-light {
   display: block;
 }
 
@@ -540,7 +576,7 @@ button[type="submit"]:disabled {
 }
 
 .ds-badge__value {
-  text-shadow: 0 0 12px rgba(242, 233, 221, 0.35);
+  text-shadow: 0 0 12px rgba(var(--glow-rgb), 0.35);
   font-weight: 600;
 }
 
@@ -575,7 +611,7 @@ button[type="submit"]:disabled {
   font-size: 2.5rem;
   font-weight: 700;
   line-height: 1.1;
-  text-shadow: 0 0 24px rgba(242, 233, 221, 0.25);
+  text-shadow: 0 0 24px rgba(var(--glow-rgb), 0.25);
 }
 
 .ds-stat__label {

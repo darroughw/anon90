@@ -2,6 +2,7 @@ import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import ThemeToggle from "@/components/ThemeToggle";
 import "./globals.css";
 
 const siteUrl = "https://rhythmrecovery.app";
@@ -47,12 +48,18 @@ const jsonLd = {
   description,
 };
 
+// Sets data-theme before first paint so there's no flash of the wrong
+// palette. Dark is the default (see docs/mvp-scope.md -> Color Palette),
+// so this only has to act when light was explicitly chosen last time.
+const themeInitScript = `(function(){try{if(localStorage.getItem("rr-theme")==="light"){document.documentElement.dataset.theme="light"}}catch(e){}})();`;
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
       <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -66,8 +73,16 @@ export default function RootLayout({
         <header className="site-header">
           <Link href="/">
             <Image
-              className="logo"
+              className="logo logo-dark"
               src="/assets/logo/rhythm-recovery.svg"
+              alt="Rhythm Recovery"
+              width={230}
+              height={163}
+              priority
+            />
+            <Image
+              className="logo logo-light"
+              src="/assets/logo/rhythm-recovery-light.svg"
               alt="Rhythm Recovery"
               width={230}
               height={163}
@@ -80,6 +95,9 @@ export default function RootLayout({
 
         <footer className="site-footer">
           <Link href="/privacy">Privacy Policy</Link>
+          <div style={{ marginTop: "1rem", display: "flex", justifyContent: "center" }}>
+            <ThemeToggle />
+          </div>
         </footer>
 
         <Analytics />

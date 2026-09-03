@@ -2,7 +2,7 @@
 
 A daily habit tracker that pairs fixed recovery commitments with the 12 steps, built to help people keep that rhythm one day at a time. See [docs/mvp-scope.md](docs/mvp-scope.md) for the full product scope, name, mission, and voice guide.
 
-This repo holds the pre-launch landing page plus the early scaffolding of the full app (auth, onboarding, dashboard). The core product loop (daily checklist, streaks, milestones) is still tracked in Linear under the Anon90 team, Rhythm Recovery project, and mostly unbuilt.
+This repo holds the pre-launch landing page and the full app: auth, onboarding, the daily-checklist/streak/milestone core loop, reminders, and email. Tracked in Linear under the Anon90 team, Rhythm Recovery project.
 
 ## Stack
 
@@ -40,6 +40,7 @@ The landing page and sign-up form work with no configuration (email address, log
 - `components/SignupForm.tsx` — landing-page sign-up form, including the Google Identity Services button
 - `components/auth/` — `LoginForm`, `SignUpForm`
 - `components/ui/` — shared primitives (Button, Input, Dialog, Toast, Switch, etc.)
+- `components/ThemeToggle.tsx` — dark/light switch (footer, every page); dark is the default, choice persists in `localStorage`, applied via a blocking inline script in `app/layout.tsx` before first paint to avoid a flash of the wrong theme. Light-mode tokens live in `app/globals.css` under `:root[data-theme="light"]`.
 - `lib/supabase/` — `client.ts`/`server.ts` (browser/server Supabase clients), `proxy.ts` (session-refresh middleware helper)
 - `lib/verifyGoogleToken.ts` — verifies a Google Sign-In ID token server-side
 - `lib/googleSheets.ts` — appends a signup row to a Google Sheet via a service account
