@@ -13,9 +13,9 @@ type UnsubscribePageProps = {
 
 export default async function UnsubscribePage({ searchParams }: UnsubscribePageProps) {
   const { token } = await searchParams;
-  const userId = token ? verifyUnsubscribeToken(token) : null;
+  const subject = token ? verifyUnsubscribeToken(token) : null;
 
-  if (!userId) {
+  if (!subject) {
     return (
       <main id="main" className="policy">
         <h1>This unsubscribe link isn&apos;t valid</h1>
@@ -28,10 +28,13 @@ export default async function UnsubscribePage({ searchParams }: UnsubscribePageP
   }
 
   const supabase = createAdminClient();
-  const { error } = await supabase
-    .from("profiles")
-    .update({ marketing_emails_opt_in: false })
-    .eq("id", userId);
+
+  // The signed token's subject is either a Supabase user id (registered
+  // account) or a raw email address (pre-account sends, e.g. the waitlist
+  // launch announcement) -- route to the matching suppression mechanism.
+  const { error } = subject.includes("@")
+    ? await supabase.from("email_suppressions").upsert({ email: subject.toLowerCase() })
+    : await supabase.from("profiles").update({ marketing_emails_opt_in: false }).eq("id", subject);
 
   return (
     <main id="main" className="policy">

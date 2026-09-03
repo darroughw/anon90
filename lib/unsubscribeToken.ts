@@ -4,23 +4,32 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 // server-only value in this project, so no new secret to provision.
 const SECRET = process.env.SUPABASE_JWT_SECRET;
 
-export function createUnsubscribeToken(userId: string): string {
+// Signature is a fixed-length (64 hex chars) HMAC-SHA256 digest, appended
+// directly rather than joined with a separator -- subjects can be email
+// addresses, which routinely contain ".", so splitting on a delimiter
+// would silently truncate them instead of failing loudly.
+const SIGNATURE_LENGTH = 64;
+
+export function createUnsubscribeToken(subject: string): string {
   if (!SECRET) {
     throw new Error("SUPABASE_JWT_SECRET is required to create unsubscribe tokens");
   }
 
-  const signature = createHmac("sha256", SECRET).update(userId).digest("hex");
-  return Buffer.from(`${userId}.${signature}`).toString("base64url");
+  const signature = createHmac("sha256", SECRET).update(subject).digest("hex");
+  return Buffer.from(`${subject}${signature}`).toString("base64url");
 }
 
 export function verifyUnsubscribeToken(token: string): string | null {
   if (!SECRET) return null;
 
   try {
-    const [userId, signature] = Buffer.from(token, "base64url").toString("utf8").split(".");
-    if (!userId || !signature) return null;
+    const decoded = Buffer.from(token, "base64url").toString("utf8");
+    if (decoded.length <= SIGNATURE_LENGTH) return null;
 
-    const expected = createHmac("sha256", SECRET).update(userId).digest("hex");
+    const subject = decoded.slice(0, -SIGNATURE_LENGTH);
+    const signature = decoded.slice(-SIGNATURE_LENGTH);
+
+    const expected = createHmac("sha256", SECRET).update(subject).digest("hex");
     const provided = Buffer.from(signature);
     const expectedBuffer = Buffer.from(expected);
 
@@ -28,7 +37,7 @@ export function verifyUnsubscribeToken(token: string): string | null {
       return null;
     }
 
-    return userId;
+    return subject;
   } catch {
     return null;
   }
