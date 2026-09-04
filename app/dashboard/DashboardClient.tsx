@@ -133,6 +133,20 @@ function DashboardInner({ profile }: { profile: Profile }) {
     };
   }, [supabase, today]);
 
+  // If the tab stays open across the local day boundary, today's checklist
+  // would otherwise keep showing yesterday until a manual refresh. Checked
+  // on an interval rather than a precise midnight timeout so it still fires
+  // correctly after the machine sleeps and wakes.
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (localToday() !== today) {
+        window.location.reload();
+      }
+    }, 60_000);
+
+    return () => clearInterval(interval);
+  }, [today]);
+
   const requiredToday = requiredItemsForDate(items, today);
   const todayCompletedIds = new Set(
     completions.filter((c) => c.entry_date === today && c.completed).map((c) => c.checklist_item_id),
