@@ -32,3 +32,15 @@ yarn-error.log*
 /test-results/
 /playwright-report/
 /blob-report/
+
+# ios
+/ios/RhythmRecovery.xcodeproj/
+/ios/**/Generated/
+/ios/RhythmRecovery/Resources/Secrets.xcconfig
+/ios/.build/
+/ios/RhythmCore/.build/
+/ios/**/*.xcuserstate
+/ios/**/xcuserdata/
+
+# supabase CLI local state
+/supabase/.temp/
