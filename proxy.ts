@@ -1,7 +1,15 @@
 import { type NextRequest } from "next/server";
 import { updateSession } from "@/lib/supabase/proxy";
 
-const PROTECTED_PREFIXES = ["/signup", "/login", "/onboarding", "/dashboard", "/auth"];
+const PROTECTED_PREFIXES = [
+  "/signup",
+  "/login",
+  "/forgot-password",
+  "/reset-password",
+  "/onboarding",
+  "/dashboard",
+  "/auth",
+];
 
 function isProtectedPath(pathname: string): boolean {
   return PROTECTED_PREFIXES.some(

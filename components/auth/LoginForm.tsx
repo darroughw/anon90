@@ -83,6 +83,10 @@ export default function LoginForm() {
         />
       </FormField>
 
+      <p className="hint" style={{ textAlign: "right", marginTop: "-0.5rem", marginBottom: "1rem" }}>
+        <Link href="/forgot-password">Forgot password?</Link>
+      </p>
+
       <Button type="submit" className="ds-button--block" disabled={submitting} loading={submitting}>
         Sign in
       </Button>
