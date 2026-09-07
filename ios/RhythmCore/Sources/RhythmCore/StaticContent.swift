@@ -33,7 +33,12 @@ public let helpfulLinks: [HelpfulLink] = [
     HelpfulLink(
         label: "988 Suicide & Crisis Lifeline",
         href: "https://988lifeline.org",
-        description: "Call or text 988, 24/7."
+        description: "US & Canada. Call or text 988, 24/7."
+    ),
+    HelpfulLink(
+        label: "Samaritans",
+        href: "https://www.samaritans.org",
+        description: "UK & Ireland. Call 116 123, free and 24/7."
     ),
     HelpfulLink(
         label: "AA meeting finder",
