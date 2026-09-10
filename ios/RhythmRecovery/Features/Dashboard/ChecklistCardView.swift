@@ -20,11 +20,10 @@ struct ChecklistCardView: View {
                 }
             }
 
-            ProgressView(
-                value: Double(viewModel.completedTodayCount),
-                total: Double(max(viewModel.requiredToday.count, 1))
+            LogoProgressTrackerView(
+                completed: viewModel.completedTodayCount,
+                total: viewModel.requiredToday.count
             )
-            .tint(RRColor.foreground)
 
             if viewModel.dayComplete {
                 Text("Today's list is complete.")

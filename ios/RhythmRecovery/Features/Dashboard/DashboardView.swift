@@ -102,6 +102,8 @@ struct DashboardView: View {
 
     private var header: some View {
         VStack(spacing: 12) {
+            LogoMarkView()
+
             Text("Welcome back, \(viewModel.profile.username)")
                 .font(.title2.bold())
                 .foregroundStyle(RRColor.foreground)

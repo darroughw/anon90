@@ -3,15 +3,29 @@ import SwiftUI
 
 struct RootView: View {
     @Environment(AuthStore.self) private var authStore
+    @State private var showSplash = true
 
     var body: some View {
-        Group {
-            if !authStore.hasResolvedInitialSession {
-                LoadingView()
-            } else if let userId = authStore.userId {
-                SignedInRouterView(userId: userId)
-            } else {
-                AuthFlowView()
+        ZStack {
+            Group {
+                if !authStore.hasResolvedInitialSession {
+                    LoadingView()
+                } else if let userId = authStore.userId {
+                    SignedInRouterView(userId: userId)
+                } else {
+                    AuthFlowView()
+                }
+            }
+
+            if showSplash {
+                SplashView()
+                    .transition(.opacity.combined(with: .scale(scale: 1.06)))
+            }
+        }
+        .onChange(of: authStore.hasResolvedInitialSession) { _, resolved in
+            guard resolved else { return }
+            withAnimation(.easeOut(duration: 0.25)) {
+                showSplash = false
             }
         }
     }
