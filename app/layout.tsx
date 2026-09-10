@@ -97,6 +97,27 @@ export default function RootLayout({
           <Link href="/privacy">Privacy Policy</Link>
           {" · "}
           <Link href="/terms">Terms of Service</Link>
+          <div style={{ marginTop: "1rem" }}>
+            <a
+              href="https://apps.apple.com/app/rhythmrecovery/id6809193884"
+              aria-label="Download Rhythm Recovery on the App Store"
+            >
+              <Image
+                className="app-store-badge badge-dark"
+                src="/assets/app-store/badge-white.svg"
+                alt="Download on the App Store"
+                width={120}
+                height={40}
+              />
+              <Image
+                className="app-store-badge badge-light"
+                src="/assets/app-store/badge-black.svg"
+                alt="Download on the App Store"
+                width={120}
+                height={40}
+              />
+            </a>
+          </div>
           <div style={{ marginTop: "1rem", display: "flex", justifyContent: "center" }}>
             <ThemeToggle />
           </div>

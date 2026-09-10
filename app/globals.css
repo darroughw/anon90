@@ -307,6 +307,23 @@ button[type="submit"]:disabled {
   font-size: 0.85rem;
 }
 
+.app-store-badge {
+  height: 40px;
+  width: auto;
+}
+
+.badge-light {
+  display: none;
+}
+
+:root[data-theme="light"] .badge-dark {
+  display: none;
+}
+
+:root[data-theme="light"] .badge-light {
+  display: inline-block;
+}
+
 @media (min-width: 640px) {
   .site-header {
     padding-top: 3rem;
