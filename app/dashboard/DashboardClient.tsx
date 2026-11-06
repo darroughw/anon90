@@ -43,7 +43,7 @@ type Profile = {
   has_service_position: boolean;
   has_homegroup: boolean;
   reminder_toast_enabled: boolean;
-  reminder_email_enabled: boolean;
+  reminder_push_enabled: boolean;
   marketing_emails_opt_in: boolean;
 };
 
@@ -258,7 +258,7 @@ function DashboardInner({ profile }: { profile: Profile }) {
         hasHomegroup={profile.has_homegroup}
         sobrietyDate={profile.sobriety_date}
         reminderToastEnabled={profile.reminder_toast_enabled}
-        reminderEmailEnabled={profile.reminder_email_enabled}
+        reminderPushEnabled={profile.reminder_push_enabled}
         marketingEmailsOptIn={profile.marketing_emails_opt_in}
       />
 

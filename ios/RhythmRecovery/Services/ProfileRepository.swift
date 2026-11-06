@@ -10,7 +10,7 @@ struct ProfileRepository {
         try await client
             .from("profiles")
             .select(
-                "username, sobriety_date, has_sponsor, has_service_position, has_homegroup, reminder_toast_enabled, reminder_email_enabled, marketing_emails_opt_in"
+                "username, sobriety_date, has_sponsor, has_service_position, has_homegroup, reminder_toast_enabled, reminder_push_enabled, marketing_emails_opt_in"
             )
             .eq("id", value: userId)
             .maybeSingle()

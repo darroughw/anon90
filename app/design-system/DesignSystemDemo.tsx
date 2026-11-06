@@ -75,7 +75,7 @@ export default function DesignSystemDemo() {
             <Textarea name="ds-journal" />
           </FormField>
           <Checkbox
-            label="Email me reminders"
+            label="Push notification reminders"
             checked={checked}
             onChange={(event) => setChecked(event.target.checked)}
           />

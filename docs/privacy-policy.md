@@ -20,9 +20,10 @@ Rhythm Recovery ("we," "us") helps you track daily activities over a 90-day peri
 - Sponsor, service position, and homegroup status
 
 **Communication preferences**
-- Reminder settings (in-app and email reminders, each on or off independently)
+- Reminder settings (in-app and push reminders, each on or off independently)
 - Your timezone (used only to send reminders at the right local time)
 - Subscriber list status (opted in or out of product-update emails)
+- If you've enabled push reminders on iOS: a device push token, used only to deliver that reminder
 
 **Usage analytics**
 - Aggregate, non-identifying usage data (e.g. page views) via Vercel Analytics, used solely to improve the product. We do not use analytics to build advertising profiles.
@@ -37,7 +38,7 @@ Rhythm Recovery ("we," "us") helps you track daily activities over a 90-day peri
 ## How We Use Information
 
 - To operate your account and the core tracking features
-- To send reminders you've opted into (in-app, email, or both)
+- To send reminders you've opted into (in-app, push, or both)
 - To send product-update emails, only if you've opted in (unsubscribe available from account settings, and from a one-click link in every marketing email sent to a signed-in account)
 - To improve the product via aggregate, non-identifying analytics
 - To respond to support requests
@@ -53,14 +54,15 @@ Rhythm Recovery ("we," "us") helps you track daily activities over a 90-day peri
 We use third-party infrastructure providers to operate the product. These providers process data only on our behalf, under contractual terms that prohibit them from using it for their own purposes:
 
 - **Supabase** — authentication and the primary database (profiles, daily activity)
-- **Resend** — sends account and reminder emails
+- **Resend** — sends account emails
+- **Apple Push Notification service** — delivers push reminders to the iOS app, if you've enabled them
 - **Google** — "Continue with Google" sign-in, if you use it
 - **Vercel** — hosting and aggregate analytics
 
 ## Your Choices
 
 - Change your anonymous display name, sponsor/service position/homegroup status, and sobriety date at any time from your profile
-- Turn in-app and email reminders on or off independently
+- Turn in-app and push reminders on or off independently
 - Opt in/out of product-update emails independently of reminders
 - Delete your account at any time from your profile
 

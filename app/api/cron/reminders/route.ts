@@ -1,20 +1,16 @@
-import { render } from "@react-email/render";
 import { NextResponse } from "next/server";
-import { Resend } from "resend";
-import ReminderEmail, { subject } from "@/emails/reminder";
+import { sendPush } from "@/lib/apns";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { requiredItemsForDate } from "@/lib/streaks";
 import { localDateString, localHour } from "@/lib/timezone";
-
-const FROM = process.env.EMAIL_FROM || "Rhythm Recovery <onboarding@resend.dev>";
 
 // ~3 hours before the midnight day boundary (docs/mvp-scope.md -> Reminders).
 const REMINDER_HOUR = 21;
 
 /**
- * Runs hourly (see vercel.json). For each user with email reminders on,
- * whose local time is REMINDER_HOUR, sends a reminder if today's checklist
- * (in their local timezone) isn't complete yet.
+ * Runs hourly (see README -> Reminders & cron). For each user with push reminders on,
+ * whose local time is REMINDER_HOUR, sends a push to every registered device if today's
+ * checklist (in their local timezone) isn't complete yet.
  */
 export async function GET(request: Request) {
   const cronSecret = process.env.CRON_SECRET;
@@ -22,19 +18,12 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const resendApiKey = process.env.RESEND_API_KEY;
-  if (!resendApiKey) {
-    console.warn("[cron/reminders] RESEND_API_KEY not set, skipping run");
-    return NextResponse.json({ checked: 0, sent: 0 });
-  }
-
   const supabase = createAdminClient();
-  const resend = new Resend(resendApiKey);
 
   const { data: profiles, error } = await supabase
     .from("profiles")
     .select("id, timezone")
-    .eq("reminder_email_enabled", true);
+    .eq("reminder_push_enabled", true);
 
   if (error) {
     console.error("[cron/reminders] failed to load profiles:", error.message);
@@ -68,18 +57,29 @@ export async function GET(request: Request) {
 
     if (tasksRemaining === 0) continue;
 
-    const { data: userData } = await supabase.auth.admin.getUserById(profile.id);
-    const email = userData?.user?.email;
-    if (!email) continue;
+    const { data: tokens } = await supabase
+      .from("device_tokens")
+      .select("id, token")
+      .eq("user_id", profile.id);
 
-    const html = await render(<ReminderEmail tasksRemaining={tasksRemaining} />);
-    const { error: sendError } = await resend.emails.send({ from: FROM, to: email, subject, html });
+    if (!tokens || tokens.length === 0) continue;
 
-    if (sendError) {
-      console.error("[cron/reminders] Resend error for", profile.id, sendError.message);
-    } else {
-      sent += 1;
+    let sentToUser = false;
+
+    for (const device of tokens) {
+      const result = await sendPush(device.token, tasksRemaining);
+
+      if (result.ok) {
+        sentToUser = true;
+      } else {
+        console.error("[cron/reminders] APNs error for", profile.id, result.error);
+        if (result.shouldForget) {
+          await supabase.from("device_tokens").delete().eq("id", device.id);
+        }
+      }
     }
+
+    if (sentToUser) sent += 1;
   }
 
   return NextResponse.json({ checked: due.length, sent });

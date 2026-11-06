@@ -55,8 +55,8 @@ targets:
           - UIInterfaceOrientationPortrait
         UIUserInterfaceStyle: Dark
         NSUserNotificationsUsageDescription: >-
-          Rhythm Recovery uses notifications to remind you if today's checklist
-          is still open.
+          Rhythm Recovery uses notifications (local and push) to remind you if
+          today's checklist is still open.
         # Only standard HTTPS/TLS is used (no custom cryptography), so this
         # skips the export-compliance prompt on every TestFlight/App Store
         # upload.
@@ -66,6 +66,8 @@ targets:
       properties:
         com.apple.developer.applesignin:
           - Default
+        # Flip to "production" before archiving a release build (see README -> Reminders & cron)
+        aps-environment: development
 
   RhythmRecoveryTests:
     type: bundle.unit-test

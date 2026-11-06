@@ -49,9 +49,10 @@ export default function PrivacyPage() {
         <strong>Communication preferences</strong>
       </p>
       <ul>
-        <li>Reminder settings (in-app and email reminders, each on or off independently)</li>
+        <li>Reminder settings (in-app and push reminders, each on or off independently)</li>
         <li>Your timezone (used only to send reminders at the right local time)</li>
         <li>Subscriber list status (opted in or out of product-update emails)</li>
+        <li>If you&apos;ve enabled push reminders on iOS: a device push token, used only to deliver that reminder</li>
       </ul>
 
       <p>
@@ -80,7 +81,7 @@ export default function PrivacyPage() {
       <h2>How We Use Information</h2>
       <ul>
         <li>To operate your account and the core tracking features</li>
-        <li>To send reminders you&apos;ve opted into (in-app, email, or both)</li>
+        <li>To send reminders you&apos;ve opted into (in-app, push, or both)</li>
         <li>
           To send product-update emails, only if you&apos;ve opted in
           (unsubscribe available from account settings, and from a one-click
@@ -116,7 +117,11 @@ export default function PrivacyPage() {
           (profiles, daily activity)
         </li>
         <li>
-          <strong>Resend</strong> — sends account and reminder emails
+          <strong>Resend</strong> — sends account emails
+        </li>
+        <li>
+          <strong>Apple Push Notification service</strong> — delivers push
+          reminders to the iOS app, if you&apos;ve enabled them
         </li>
         <li>
           <strong>Google</strong> — &quot;Continue with Google&quot; sign-in,
@@ -134,7 +139,7 @@ export default function PrivacyPage() {
           position/homegroup status, and sobriety date at any time from your
           profile
         </li>
-        <li>Turn in-app and email reminders on or off independently</li>
+        <li>Turn in-app and push reminders on or off independently</li>
         <li>Opt in/out of product-update emails independently of reminders</li>
         <li>Delete your account at any time from your profile</li>
       </ul>

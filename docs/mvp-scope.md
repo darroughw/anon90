@@ -90,12 +90,11 @@ Both palettes share the same near-black/cream pair, just inverted — the toggle
 
 ## Reminders
 - In-app toast reminder for incomplete tasks ahead of day-end
-- Email reminder as a secondary/backup channel
+- Push notification reminder (iOS) as a secondary/backup channel
 - User-configurable per channel (on/off), default timing TBD (e.g. 3 hrs before day-end)
 
 ## Email System
-Two distinct categories — keep separate in the data model and unsubscribe logic:
-- **Transactional**: reminders, streak/milestone notifications — tied to core product function
+- **Transactional**: streak/milestone notifications — tied to core product function
 - **Subscriber/marketing**: product updates, tips — explicit opt-in, one-click unsubscribe required (CAN-SPAM/GDPR)
 
 ## Sharing

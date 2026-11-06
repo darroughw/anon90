@@ -42,7 +42,7 @@ export default async function UnsubscribePage({ searchParams }: UnsubscribePageP
       <p>
         {error
           ? "We couldn't process that. Try again from your profile settings, or reach out if it keeps happening."
-          : "You won't get product update or tips emails anymore. Transactional emails you've opted into, like reminders, aren't affected."}
+          : "You won't get product update or tips emails anymore. Transactional emails (account-related) and push reminders aren't affected."}
       </p>
     </main>
   );

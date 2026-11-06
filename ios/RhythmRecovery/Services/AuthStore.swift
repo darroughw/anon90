@@ -32,6 +32,9 @@ final class AuthStore {
 
     func signOut() async {
         NotificationScheduler.cancel()
+        if let userId {
+            await PushNotificationManager.unregisterCurrentToken(userId: userId)
+        }
         try? await SupabaseClient.shared.auth.signOut()
     }
 }

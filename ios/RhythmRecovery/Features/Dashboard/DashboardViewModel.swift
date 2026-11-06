@@ -65,6 +65,7 @@ final class DashboardViewModel {
 
     func syncNotifications() async {
         await NotificationScheduler.sync(enabled: profile.reminderToastEnabled, dayIncomplete: !dayComplete)
+        await PushNotificationManager.sync(enabled: profile.reminderPushEnabled)
     }
 
     /// Call periodically (e.g. from a 60s timer) — reloads everything when the device's

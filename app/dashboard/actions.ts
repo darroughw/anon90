@@ -11,7 +11,7 @@ type UpdateProfileInput = {
   hasHomegroup: boolean;
   sobrietyDate: string;
   reminderToastEnabled: boolean;
-  reminderEmailEnabled: boolean;
+  reminderPushEnabled: boolean;
   marketingEmailsOptIn: boolean;
 };
 
@@ -46,7 +46,7 @@ export async function updateProfile(input: UpdateProfileInput): Promise<UpdatePr
       has_homegroup: input.hasHomegroup,
       sobriety_date: input.sobrietyDate,
       reminder_toast_enabled: input.reminderToastEnabled,
-      reminder_email_enabled: input.reminderEmailEnabled,
+      reminder_push_enabled: input.reminderPushEnabled,
       marketing_emails_opt_in: input.marketingEmailsOptIn,
     })
     .eq("id", userId);

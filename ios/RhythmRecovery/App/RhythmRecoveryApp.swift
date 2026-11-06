@@ -3,6 +3,7 @@ import SwiftUI
 
 @main
 struct RhythmRecoveryApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @State private var authStore = AuthStore()
 
     var body: some Scene {

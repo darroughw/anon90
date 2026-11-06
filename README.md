@@ -49,9 +49,10 @@ The homepage itself renders with no configuration, but its "Create your account"
 - `lib/quotes.ts`, `lib/helpfulLinks.ts` — dashboard content (daily quote, curated resource links)
 - `lib/timezone.ts` — local-hour/local-date helpers for a given IANA timezone, used server-side (no "device" in a cron job) to compute each user's day boundary
 - `lib/unsubscribeToken.ts` — signs/verifies the token used by `/unsubscribe`
+- `lib/apns.ts` — signs an APNs auth token (ES256 JWT) and sends alert pushes over HTTP/2
 - `lib/supabase/admin.ts` — service-role client for server-only code with no user session (the reminders cron, `/unsubscribe`)
 - `proxy.ts` — root middleware: gates `/login`, `/signup`, `/onboarding`, `/dashboard`, `/auth` behind Basic Auth on preview/dev deployments (via `DEV_BASIC_AUTH_PASSWORD`), then refreshes the Supabase session
-- `app/api/cron/reminders/route.tsx` — hourly (see `vercel.json`): emails users whose local time is 9pm and whose checklist for the day isn't complete
+- `app/api/cron/reminders/route.ts` — hourly (see `vercel.json`): pushes to users whose local time is 9pm and whose checklist for the day isn't complete
 - `app/unsubscribe/` — one-click unsubscribe from marketing/subscriber emails, verifies a signed token, no login required
 - `supabase/migrations/` — schema changes, applied by hand via the Supabase SQL Editor (no `supabase` CLI linkage yet)
 - `emails/` — transactional email templates (see Email templates below)
@@ -73,7 +74,6 @@ Built with [react-email](https://react.email) and sent via [Resend](https://rese
 - `emails/confirmation.tsx` — sent right after someone registers via the legacy waitlist endpoint (transactional/subscriber — see Email system below); dormant while that endpoint is unlinked
 - `emails/launch.tsx` — for the list when the app is ready; not wired to an actual send yet (no bulk-send/campaign tooling built)
 - `emails/authAction.tsx` — signup confirmation, password reset, magic link, email change — sent via a Supabase Auth "Send Email" hook (`app/api/auth/send-email/route.tsx`) instead of Supabase's default sender/template
-- `emails/reminder.tsx` — the email half of Reminders, sent by `app/api/cron/reminders/route.tsx`
 - `emails/components/EmailLayout.tsx` — shared shell (logo, footer, privacy link, optional unsubscribe link)
 
 Preview them locally:
@@ -90,12 +90,12 @@ The email logo (`public/email/logo.png`) is a separate asset from the site logo:
 
 Per docs/mvp-scope.md, transactional and marketing/subscriber emails are kept separate:
 
-- **Transactional** (`authAction.tsx`, `reminder.tsx`) — tied to core product function, no unsubscribe link; users control reminders via the per-channel toggles in the profile-edit dialog instead.
+- **Transactional** (`authAction.tsx`) — tied to core product function, no unsubscribe link. Reminders are no longer an email — they're a push notification (see Reminders & cron below); users control both channels via the per-channel toggles in the profile-edit dialog.
 - **Marketing/subscriber** (`confirmation.tsx`, `launch.tsx`) — explicit opt-in (`profiles.marketing_emails_opt_in`, off by default) and one-click unsubscribe (`app/unsubscribe/`, token-verified, no login required). This only covers registered users — the legacy pre-launch waitlist (Google Sheets-backed, see Google integration) has no working unsubscribe, since there's no per-row status to update there. Moot while that capture point is unlinked from the site.
 
 ## Reminders & cron
 
-`app/api/cron/reminders/route.tsx` needs to run hourly, but Vercel Cron only supports daily schedules on the Hobby plan — so it's triggered instead by a GitHub Actions scheduled workflow (`.github/workflows/reminders-cron.yml`), which needs a repo secret: **GitHub → Settings → Secrets and variables → Actions → New repository secret** → name `CRON_SECRET`, same value as the Vercel env var of the same name (the route checks `Authorization: Bearer <CRON_SECRET>`, so both need to match). If this project ever moves to Vercel Pro, switching back to a native Vercel Cron entry in `vercel.json` (`{"crons":[{"path":"/api/cron/reminders","schedule":"0 * * * *"}]}`) is simpler and one less thing depending on GitHub Actions staying enabled.
+`app/api/cron/reminders/route.ts` needs to run hourly, but Vercel Cron only supports daily schedules on the Hobby plan — so it's triggered instead by a GitHub Actions scheduled workflow (`.github/workflows/reminders-cron.yml`), which needs a repo secret: **GitHub → Settings → Secrets and variables → Actions → New repository secret** → name `CRON_SECRET`, same value as the Vercel env var of the same name (the route checks `Authorization: Bearer <CRON_SECRET>`, so both need to match). If this project ever moves to Vercel Pro, switching back to a native Vercel Cron entry in `vercel.json` (`{"crons":[{"path":"/api/cron/reminders","schedule":"0 * * * *"}]}`) is simpler and one less thing depending on GitHub Actions staying enabled.
 
 To test locally, call the route directly with the header:
 
@@ -105,11 +105,20 @@ curl -H "Authorization: Bearer $CRON_SECRET" http://localhost:3000/api/cron/remi
 
 A user's local day boundary (used both for the dashboard's `localToday()` and for this cron job) relies on `profiles.timezone`, captured once at onboarding via `Intl.DateTimeFormat().resolvedOptions().timeZone`. There's no UI to change it after signup yet.
 
+The reminder itself is a push notification, sent via `lib/apns.ts` to every row in `device_tokens` for a due, incomplete-checklist user (the iOS app registers a token there — see `ios/RhythmRecovery/Services/PushNotificationManager.swift` and `DeviceTokenRepository.swift`). Needs these env vars, none of which are set yet (the route logs and skips a user's push when they're missing, same as the old `RESEND_API_KEY` fallback):
+
+- `APNS_KEY_ID`, `APNS_TEAM_ID` — from the Apple Developer account's APNs Auth Key (Certificates, Identifiers & Profiles → Keys)
+- `APNS_PRIVATE_KEY` — the `.p8` key's contents (`\n`-escaped if set as a single-line env var)
+- `APNS_BUNDLE_ID` — `com.rhythmrecovery.app` (must match `ios/project.yml`'s `PRODUCT_BUNDLE_IDENTIFIER`)
+- `APNS_ENV` — `production` once shipping via TestFlight/App Store; anything else (including unset) uses the sandbox APNs host, matching the `aps-environment: development` entitlement `ios/project.yml` ships with today
+
 ## Known gaps
 
 - `supabase/migrations/` isn't applied automatically — there's no `supabase` CLI project link, so new migrations need to be pasted into the Supabase SQL Editor by hand.
 - The legacy pre-launch waitlist (Google Sheets) has no working unsubscribe, and isn't linked from the site (see Email system above) — candidate for removal.
 - `profiles.timezone` has no settings-page UI to change after onboarding.
+- No APNs auth key has been generated yet — `lib/apns.ts` is wired up but every push send no-ops (logged, not thrown) until `APNS_KEY_ID`/`APNS_TEAM_ID`/`APNS_PRIVATE_KEY` are set.
+- `ios/project.yml`'s push entitlement is pinned to `aps-environment: development`; flip it to `production` before archiving a release build, or device tokens registered against a TestFlight/App Store build won't be reachable in the `production` APNs environment (and vice versa).
 
 ## CI & accessibility
 

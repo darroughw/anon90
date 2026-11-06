@@ -29,7 +29,7 @@ type ProfileEditDialogProps = {
   hasHomegroup: boolean;
   sobrietyDate: string;
   reminderToastEnabled: boolean;
-  reminderEmailEnabled: boolean;
+  reminderPushEnabled: boolean;
   marketingEmailsOptIn: boolean;
 };
 
@@ -47,7 +47,7 @@ export default function ProfileEditDialog({
   hasHomegroup,
   sobrietyDate,
   reminderToastEnabled,
-  reminderEmailEnabled,
+  reminderPushEnabled,
   marketingEmailsOptIn,
 }: ProfileEditDialogProps) {
   const router = useRouter();
@@ -57,7 +57,7 @@ export default function ProfileEditDialog({
   const [homegroupValue, setHomegroupValue] = useState(hasHomegroup);
   const [sobrietyDateValue, setSobrietyDateValue] = useState(sobrietyDate);
   const [reminderToastValue, setReminderToastValue] = useState(reminderToastEnabled);
-  const [reminderEmailValue, setReminderEmailValue] = useState(reminderEmailEnabled);
+  const [reminderPushValue, setReminderPushValue] = useState(reminderPushEnabled);
   const [marketingOptInValue, setMarketingOptInValue] = useState(marketingEmailsOptIn);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -82,7 +82,7 @@ export default function ProfileEditDialog({
       hasHomegroup: homegroupValue,
       sobrietyDate: sobrietyDateValue,
       reminderToastEnabled: reminderToastValue,
-      reminderEmailEnabled: reminderEmailValue,
+      reminderPushEnabled: reminderPushValue,
       marketingEmailsOptIn: marketingOptInValue,
     });
 
@@ -196,9 +196,9 @@ export default function ProfileEditDialog({
         </div>
         <div style={{ marginBottom: "0.75rem" }}>
           <Switch
-            label="Email me if today's list is still open"
-            checked={reminderEmailValue}
-            onCheckedChange={setReminderEmailValue}
+            label="Send a push notification if today's list is still open"
+            checked={reminderPushValue}
+            onCheckedChange={setReminderPushValue}
           />
         </div>
         <div style={{ marginBottom: "1.25rem" }}>

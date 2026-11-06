@@ -73,7 +73,7 @@ public struct Profile: Codable, Equatable, Sendable {
     public var hasServicePosition: Bool
     public var hasHomegroup: Bool
     public var reminderToastEnabled: Bool
-    public var reminderEmailEnabled: Bool
+    public var reminderPushEnabled: Bool
     public var marketingEmailsOptIn: Bool
 
     enum CodingKeys: String, CodingKey {
@@ -83,7 +83,7 @@ public struct Profile: Codable, Equatable, Sendable {
         case hasServicePosition = "has_service_position"
         case hasHomegroup = "has_homegroup"
         case reminderToastEnabled = "reminder_toast_enabled"
-        case reminderEmailEnabled = "reminder_email_enabled"
+        case reminderPushEnabled = "reminder_push_enabled"
         case marketingEmailsOptIn = "marketing_emails_opt_in"
     }
 
@@ -94,7 +94,7 @@ public struct Profile: Codable, Equatable, Sendable {
         hasServicePosition: Bool,
         hasHomegroup: Bool,
         reminderToastEnabled: Bool,
-        reminderEmailEnabled: Bool,
+        reminderPushEnabled: Bool,
         marketingEmailsOptIn: Bool
     ) {
         self.username = username
@@ -103,7 +103,7 @@ public struct Profile: Codable, Equatable, Sendable {
         self.hasServicePosition = hasServicePosition
         self.hasHomegroup = hasHomegroup
         self.reminderToastEnabled = reminderToastEnabled
-        self.reminderEmailEnabled = reminderEmailEnabled
+        self.reminderPushEnabled = reminderPushEnabled
         self.marketingEmailsOptIn = marketingEmailsOptIn
     }
 }

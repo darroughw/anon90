@@ -50,7 +50,7 @@ struct ProfileEditView: View {
 
                 Section("Reminders") {
                     Toggle("Remind me in-app if today's list is still open", isOn: $viewModel.reminderToastEnabled)
-                    Toggle("Email me if today's list is still open", isOn: $viewModel.reminderEmailEnabled)
+                    Toggle("Send a push notification if today's list is still open", isOn: $viewModel.reminderPushEnabled)
                     Toggle("Send me product updates and tips", isOn: $viewModel.marketingEmailsOptIn)
                 }
                 .listRowBackground(RRColor.background)

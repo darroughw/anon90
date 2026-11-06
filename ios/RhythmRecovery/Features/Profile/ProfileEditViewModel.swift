@@ -13,7 +13,7 @@ final class ProfileEditViewModel {
     var hasServicePosition: Bool
     var hasHomegroup: Bool
     var reminderToastEnabled: Bool
-    var reminderEmailEnabled: Bool
+    var reminderPushEnabled: Bool
     var marketingEmailsOptIn: Bool
 
     var errorMessage: String?
@@ -36,7 +36,7 @@ final class ProfileEditViewModel {
         hasServicePosition = profile.hasServicePosition
         hasHomegroup = profile.hasHomegroup
         reminderToastEnabled = profile.reminderToastEnabled
-        reminderEmailEnabled = profile.reminderEmailEnabled
+        reminderPushEnabled = profile.reminderPushEnabled
         marketingEmailsOptIn = profile.marketingEmailsOptIn
     }
 
@@ -67,12 +67,15 @@ final class ProfileEditViewModel {
             hasServicePosition: hasServicePosition,
             hasHomegroup: hasHomegroup,
             reminderToastEnabled: reminderToastEnabled,
-            reminderEmailEnabled: reminderEmailEnabled,
+            reminderPushEnabled: reminderPushEnabled,
             marketingEmailsOptIn: marketingEmailsOptIn
         )
 
         do {
             try await repository.update(userId: userId, to: profile)
+            if reminderPushEnabled {
+                await PushNotificationManager.sync(enabled: true)
+            }
             onSaved(profile)
             return true
         } catch {
