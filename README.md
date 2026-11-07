@@ -95,7 +95,18 @@ Per docs/mvp-scope.md, transactional and marketing/subscriber emails are kept se
 
 ## Reminders & cron
 
-`app/api/cron/reminders/route.ts` needs to run hourly, but Vercel Cron only supports daily schedules on the Hobby plan — so it's triggered instead by a GitHub Actions scheduled workflow (`.github/workflows/reminders-cron.yml`), which needs a repo secret: **GitHub → Settings → Secrets and variables → Actions → New repository secret** → name `CRON_SECRET`, same value as the Vercel env var of the same name (the route checks `Authorization: Bearer <CRON_SECRET>`, so both need to match). If this project ever moves to Vercel Pro, switching back to a native Vercel Cron entry in `vercel.json` (`{"crons":[{"path":"/api/cron/reminders","schedule":"0 * * * *"}]}`) is simpler and one less thing depending on GitHub Actions staying enabled.
+`app/api/cron/reminders/route.ts` needs to run hourly, but Vercel Cron only supports daily schedules on the Hobby plan — so it's triggered by a Supabase `pg_cron` job (`reminders-hourly`, see `supabase/migrations/20261106220000_schedule_reminders_with_pg_cron.sql`) that calls the route via `pg_net`. (It used to be a GitHub Actions scheduled workflow, but GitHub's schedules are best-effort and fired only every 5–8 hours, so most users' 9pm hour was skipped.)
+
+The job reads the bearer token from Supabase Vault at run time, so it needs a Vault secret named `cron_secret` with the same value as the Vercel `CRON_SECRET` env var (the route checks `Authorization: Bearer <CRON_SECRET>`, so both need to match). Set it in **Dashboard → Project Settings → Vault**, or `select vault.create_secret('<value>', 'cron_secret');`. If you rotate `CRON_SECRET`, update both.
+
+To see recent runs and their HTTP status:
+
+```sql
+select start_time, status, return_message from cron.job_run_details order by start_time desc limit 10;
+select created, status_code, error_msg from net._http_response order by created desc limit 10;
+```
+
+If this project ever moves to Vercel Pro, a native Vercel Cron entry in `vercel.json` (`{"crons":[{"path":"/api/cron/reminders","schedule":"0 * * * *"}]}`) is an alternative — unschedule the `pg_cron` job first (`select cron.unschedule('reminders-hourly');`) so reminders aren't sent twice.
 
 To test locally, call the route directly with the header:
 
